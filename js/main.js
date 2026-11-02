@@ -176,6 +176,22 @@
     onScroll();
   }
 
+  /* ---------- Scroll reveal ---------- */
+  var revealNodes = $$(".reveal");
+  if ("IntersectionObserver" in window) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-in");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    revealNodes.forEach(function (node) { revealObserver.observe(node); });
+  } else {
+    revealNodes.forEach(function (node) { node.classList.add("is-in"); });
+  }
+
   /* ---------- Boot ---------- */
   $$("[data-lang-select]").forEach(function (select) {
     select.addEventListener("change", function () {
