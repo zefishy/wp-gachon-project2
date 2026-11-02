@@ -16,6 +16,83 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
+  <header class="site-header" data-header>
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="GACHON WIND Baseball Club — home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 46 32" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="square">
+            <path d="M2 4 L14 16 L2 28"/>
+            <path d="M17 4 L29 16 L17 28"/>
+            <path d="M32 4 L44 16 L32 28"/>
+          </svg>
+        </span>
+        <span class="brand-type">
+          <span class="brand-name">GACHON WIND</span>
+          <span class="brand-sub">BASEBALL CLUB</span>
+        </span>
+      </a>
+
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="#club" data-nav data-i18n="nav.club">Club</a>
+        <a href="#schedule" data-nav data-i18n="nav.schedule">Schedule</a>
+        <a href="#gallery" data-nav data-i18n="nav.gallery">Gallery</a>
+        <a href="#join" data-nav data-i18n="nav.join">Join</a>
+        <a href="#contact" data-nav data-i18n="nav.contact">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <div class="lang-select lang-select-sm">
+          <label class="sr-only" for="lang-header" data-i18n="nav.language">Language</label>
+          <select class="lang-select-input" id="lang-header" data-lang-select>
+            <option value="en" lang="en">English</option>
+            <option value="ko" lang="ko">한국어</option>
+            <option value="vi" lang="vi">Tiếng Việt</option>
+            <option value="ja" lang="ja">日本語</option>
+            <option value="zh" lang="zh">简体中文</option>
+          </select>
+          <span class="lang-select-chevron" aria-hidden="true"></span>
+        </div>
+        <a class="btn btn-primary btn-sm header-cta" href="#join" data-i18n="nav.signup">Sign up</a>
+        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" data-i18n-attr="aria-label:nav.menu">
+          <span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <nav class="mobile-nav" aria-label="Mobile">
+      <a href="#club" data-nav><span class="mn-index">01</span><span data-i18n="nav.club">Club</span></a>
+      <a href="#schedule" data-nav><span class="mn-index">02</span><span data-i18n="nav.schedule">Schedule</span></a>
+      <a href="#gallery" data-nav><span class="mn-index">03</span><span data-i18n="nav.gallery">Gallery</span></a>
+      <a href="#join" data-nav><span class="mn-index">04</span><span data-i18n="nav.join">Join</span></a>
+      <a href="#contact" data-nav><span class="mn-index">05</span><span data-i18n="nav.contact">Contact</span></a>
+    </nav>
+    <div class="menu-meta">
+      <p class="menu-practice">
+        <span data-i18n="hero.practiceLabel">Practice</span>
+        <span data-i18n="hero.practiceValue">Tue &amp; Thu · 18:30</span>
+      </p>
+      <a class="menu-ig" href="https://www.instagram.com/gcu_wind" target="_blank" rel="noopener">@GCU_WIND</a>
+    </div>
+    <div class="mobile-actions">
+      <a class="btn btn-primary" href="#join" data-i18n="nav.signup">Sign up</a>
+      <div class="mobile-actions-row">
+        <div class="lang-select lang-select-lg">
+          <label class="sr-only" for="lang-menu" data-i18n="nav.language">Language</label>
+          <select class="lang-select-input" id="lang-menu" data-lang-select>
+            <option value="en" lang="en">English</option>
+            <option value="ko" lang="ko">한국어</option>
+            <option value="vi" lang="vi">Tiếng Việt</option>
+            <option value="ja" lang="ja">日本語</option>
+            <option value="zh" lang="zh">简体中文</option>
+          </select>
+          <span class="lang-select-chevron" aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <main id="main">
   </main>
 
