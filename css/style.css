@@ -126,6 +126,70 @@
   --theme-ease: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
+/* ---------- Dark theme ----------
+   Same deck, under floodlights: paper becomes night blue, accents lift so
+   text keeps WCAG AA contrast, panels deepen. Applied via data-theme on
+   <html> (see js/main.js — "Theme"), before first paint. */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12161d;
+  --bg-alt: #181e27;
+  --surface: #1e2632;
+  --surface-hero: rgba(24, 30, 39, 0.94);
+  --header-bg: rgba(18, 22, 29, 0.92);
+  --header-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --ink: #eef1f5;
+  --ink-soft: #c6cdd6;
+  --muted: #98a2ad;
+  /* Title/accent blue: same royal hue as the light theme's --blue, but at
+     full saturation (hsl 216 100% 72% vs 214 63% 78%) so display type stays
+     vivid on the night surfaces — 7.6:1 on --bg, still WCAG AAA. */
+  --blue: #70a9ff;
+  --blue-panel: #1b3a63;
+  --blue-deep: #0d1524;
+  --red: #ff5060;
+  --red-ink: #ff97a1;
+  --red-panel: #d31533;
+  --line: rgba(112, 169, 255, 0.18);
+  --line-strong: rgba(112, 169, 255, 0.45);
+  --tint: rgba(112, 169, 255, 0.09);
+  --danger: #ff8b96;
+  --danger-ink: #ffb9bf;
+  --danger-soft: rgba(255, 90, 105, 0.12);
+  --danger-field: rgba(255, 90, 105, 0.1);
+  --placeholder: #79828d;
+}
+
+/* ---------- Registered tokens ----------
+   The changing colour tokens are registered with @property so the theme
+   flip can TRANSITION them on <html> ("Theme crossfade", Motion section):
+   every var() reader — surfaces, accents, borders — follows the animated
+   value frame by frame, in one shared curve. Unregistered tokens either
+   don't change between themes (--paper) or are fine to snap
+   (--header-shadow). Browsers without @property simply switch instantly. */
+@property --bg { syntax: "<color>"; inherits: true; initial-value: #f8f8f8; }
+@property --bg-alt { syntax: "<color>"; inherits: true; initial-value: #eef1f6; }
+@property --surface { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --surface-hero { syntax: "<color>"; inherits: true; initial-value: rgba(248, 248, 248, 0.97); }
+@property --header-bg { syntax: "<color>"; inherits: true; initial-value: rgba(248, 248, 248, 0.92); }
+@property --ink { syntax: "<color>"; inherits: true; initial-value: #262626; }
+@property --ink-soft { syntax: "<color>"; inherits: true; initial-value: #464646; }
+@property --muted { syntax: "<color>"; inherits: true; initial-value: #666c74; }
+@property --blue { syntax: "<color>"; inherits: true; initial-value: #1e509a; }
+@property --blue-panel { syntax: "<color>"; inherits: true; initial-value: #1e509a; }
+@property --blue-deep { syntax: "<color>"; inherits: true; initial-value: #153b72; }
+@property --red { syntax: "<color>"; inherits: true; initial-value: #ff2c3e; }
+@property --red-ink { syntax: "<color>"; inherits: true; initial-value: #c8102e; }
+@property --red-panel { syntax: "<color>"; inherits: true; initial-value: #c8102e; }
+@property --line { syntax: "<color>"; inherits: true; initial-value: rgba(30, 80, 154, 0.16); }
+@property --line-strong { syntax: "<color>"; inherits: true; initial-value: rgba(30, 80, 154, 0.42); }
+@property --tint { syntax: "<color>"; inherits: true; initial-value: rgba(30, 80, 154, 0.05); }
+@property --danger { syntax: "<color>"; inherits: true; initial-value: #b00020; }
+@property --danger-ink { syntax: "<color>"; inherits: true; initial-value: #8f001a; }
+@property --danger-soft { syntax: "<color>"; inherits: true; initial-value: #fff0f1; }
+@property --danger-field { syntax: "<color>"; inherits: true; initial-value: #fff6f6; }
+@property --placeholder { syntax: "<color>"; inherits: true; initial-value: #9a9a9a; }
+
 /* ---------- Reset / base ---------- */
 *,
 *::before,
@@ -594,6 +658,39 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
 .mobile-actions-row { display: flex; align-items: stretch; gap: 12px; width: 100%; }
 .mobile-actions-row .theme-btn { flex: none; width: 47px; height: auto; }
 .mobile-actions-row .lang-select { flex: 1; width: auto; }
+
+/* ---------- Theme crossfade ----------
+   The dark ⇄ light flip transitions the registered colour tokens right here
+   on <html> with the non-linear --theme-ease curve: one shared animation
+   drives every surface, accent and border on the page, while each
+   component's own hover/reveal transitions keep their original timing.
+   prefers-reduced-motion collapses this to an instant switch through the
+   global reduce rule above. */
+html {
+  transition:
+    --bg var(--theme-dur) var(--theme-ease),
+    --bg-alt var(--theme-dur) var(--theme-ease),
+    --surface var(--theme-dur) var(--theme-ease),
+    --surface-hero var(--theme-dur) var(--theme-ease),
+    --header-bg var(--theme-dur) var(--theme-ease),
+    --ink var(--theme-dur) var(--theme-ease),
+    --ink-soft var(--theme-dur) var(--theme-ease),
+    --muted var(--theme-dur) var(--theme-ease),
+    --blue var(--theme-dur) var(--theme-ease),
+    --blue-panel var(--theme-dur) var(--theme-ease),
+    --blue-deep var(--theme-dur) var(--theme-ease),
+    --red var(--theme-dur) var(--theme-ease),
+    --red-ink var(--theme-dur) var(--theme-ease),
+    --red-panel var(--theme-dur) var(--theme-ease),
+    --line var(--theme-dur) var(--theme-ease),
+    --line-strong var(--theme-dur) var(--theme-ease),
+    --tint var(--theme-dur) var(--theme-ease),
+    --danger var(--theme-dur) var(--theme-ease),
+    --danger-ink var(--theme-dur) var(--theme-ease),
+    --danger-soft var(--theme-dur) var(--theme-ease),
+    --danger-field var(--theme-dur) var(--theme-ease),
+    --placeholder var(--theme-dur) var(--theme-ease);
+}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1180px) {

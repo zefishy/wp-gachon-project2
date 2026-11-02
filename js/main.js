@@ -35,6 +35,64 @@
   function readStore(key) {
     try { return window.localStorage.getItem(key); } catch (error) { return null; }
   }
+  /* ---------- Theme (dark · light) ----------
+     The saved choice wins; otherwise the page follows prefers-color-scheme
+     and keeps following it until the visitor toggles. The <html data-theme>
+     attribute is set before first paint by a small inline script in <head>,
+     so there is no flash of the wrong theme; applyTheme() re-syncs it here.
+     The colours cross-fade in CSS alone: the palette tokens are registered
+     with @property and <html> transitions them on the non-linear curve in
+     css/style.css ("Theme crossfade"), so this function stays attribute-only. */
+  var THEME_KEY = "gw-theme";
+  var THEME_COLORS = { light: "#1E509A", dark: "#12161d" };
+  var themeToggles = $$("[data-theme-toggle]");
+  var themeMedia = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+  function storedTheme() {
+    var saved = readStore(THEME_KEY);
+    return saved === "dark" || saved === "light" ? saved : null;
+  }
+
+  function systemTheme() {
+    return themeMedia && themeMedia.matches ? "dark" : "light";
+  }
+
+  function updateThemeControls() {
+    var dark = state.theme === "dark";
+    var label = t(dark ? "nav.themeLight" : "nav.themeDark");
+    themeToggles.forEach(function (button) {
+      button.setAttribute("aria-pressed", String(dark));
+      button.setAttribute("aria-label", label);
+      button.setAttribute("title", label);
+    });
+  }
+
+  function applyTheme(theme, persist) {
+    state.theme = theme === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", state.theme);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", THEME_COLORS[state.theme]);
+    updateThemeControls();
+    if (persist) store(THEME_KEY, state.theme);
+  }
+
+  function initTheme() {
+    applyTheme(storedTheme() || systemTheme(), false);
+
+    themeToggles.forEach(function (button) {
+      button.addEventListener("click", function () {
+        applyTheme(state.theme === "dark" ? "light" : "dark", true);
+      });
+    });
+
+    if (!themeMedia) return;
+    var followSystem = function (event) {
+      if (!storedTheme()) applyTheme(event.matches ? "dark" : "light", false);
+    };
+    if (themeMedia.addEventListener) themeMedia.addEventListener("change", followSystem);
+    else if (themeMedia.addListener) themeMedia.addListener(followSystem);
+  }
+
   /* ---------- Navigation ---------- */
   var header = $("[data-header]");
   var menuButton = $(".menu-btn");
