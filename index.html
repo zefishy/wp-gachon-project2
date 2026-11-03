@@ -305,7 +305,56 @@
       </div>
     </section>
 
+    <!-- GALLERY -->
+    <section class="section gallery" id="gallery">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-head-main">
+            <p class="kicker"><span class="kicker-mark" aria-hidden="true"></span><span data-i18n="gallery.kicker">Gallery</span></p>
+            <h2 class="display" data-i18n-html="gallery.title">A SEASON<br>IN <span class="red">FRAMES.</span></h2>
+          </div>
+          <p class="section-note" data-i18n="gallery.lead">Practice nights, game days and the field we call home.</p>
+        </div>
+
+        <div class="gallery-grid">
+          <button class="tile tile-field" type="button" data-lightbox data-full="static/img/gallery-field.webp" data-caption-key="gallery.cap1">
+            <img src="static/img/gallery-field.webp" alt="The baseball field under an open sky" data-i18n-attr="alt:about.alt">
+            <span class="tile-cap"><span data-i18n="gallery.cap1">Home field, Seongnam</span></span>
+          </button>
+          <button class="tile tile-gear" type="button" data-lightbox data-full="static/img/gallery-gear.webp" data-caption-key="gallery.cap5">
+            <img src="static/img/gallery-gear.webp" alt="Helmets and bats on the dirt" data-i18n-attr="alt:gallery.alt5">
+            <span class="tile-cap"><span data-i18n="gallery.cap5">Helmets and bats, ready</span></span>
+          </button>
+          <button class="tile tile-ball" type="button" data-lightbox data-full="static/img/gallery-ball.webp" data-caption-key="gallery.cap2">
+            <img src="static/img/gallery-ball.webp" alt="A baseball resting in the grass" data-i18n-attr="alt:gallery.alt2">
+            <span class="tile-cap"><span data-i18n="gallery.cap2">Between innings</span></span>
+          </button>
+          <button class="tile tile-aerial" type="button" data-lightbox data-full="static/img/gallery-aerial.webp" data-caption-key="gallery.cap4">
+            <img src="static/img/gallery-aerial.webp" alt="Aerial view of a baseball diamond" data-i18n-attr="alt:gallery.alt4">
+            <span class="tile-cap"><span data-i18n="gallery.cap4">The diamond, from above</span></span>
+          </button>
+        </div>
+        <a class="ig-banner" href="https://www.instagram.com/gcu_wind" target="_blank" rel="noopener">
+          <span class="ig-handle">@GCU_WIND</span>
+          <span class="ig-label" data-i18n="gallery.ig">More on Instagram</span>
+          <span class="chevrons" aria-hidden="true"><i></i><i></i><i></i></span>
+        </a>
+        <p class="gallery-hint" data-i18n="gallery.hint">Tap a photo to enlarge.</p>
+      </div>
+    </section>
   </main>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" data-i18n-attr="aria-label:gallery.viewer" hidden>
+    <button class="lb-btn lb-close" type="button" data-lb-close aria-label="Close" data-i18n-attr="aria-label:gallery.close">×</button>
+    <button class="lb-btn lb-prev" type="button" data-lb-prev aria-label="Previous photo" data-i18n-attr="aria-label:gallery.prev">←</button>
+    <figure class="lb-figure">
+      <img id="lb-img" alt="">
+      <figcaption id="lb-caption"></figcaption>
+    </figure>
+    <button class="lb-btn lb-next" type="button" data-lb-next aria-label="Next photo" data-i18n-attr="aria-label:gallery.next">→</button>
+    <p class="lb-count" id="lb-count" aria-hidden="true"></p>
+  </div>
 
   <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
