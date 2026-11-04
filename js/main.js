@@ -321,6 +321,80 @@
     updateCountdown();
   }
 
+  function updateCountdown() {
+    if (!state.next) {
+      if (heroNextCount) heroNextCount.textContent = "";
+      return;
+    }
+    var diff = Math.max(0, state.next.start.getTime() - Date.now());
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+    var secs = Math.floor((diff % 60000) / 1000);
+
+    if (countdownDays) countdownDays.textContent = pad(days);
+    if (countdownHours) countdownHours.textContent = pad(hours);
+    if (countdownMins) countdownMins.textContent = pad(mins);
+    if (countdownSecs) countdownSecs.textContent = pad(secs);
+
+    if (heroNextCount) {
+      heroNextCount.textContent = days > 0 ? t("schedule.dday", { d: days }) : pad(hours) + "H " + pad(mins) + "M";
+    }
+
+    if (diff <= 0 && !seasonComplete) {
+      renderSchedule();
+    }
+  }
+
+  if (state.countdownTimer) window.clearInterval(state.countdownTimer);
+  state.countdownTimer = window.setInterval(updateCountdown, 1000);
+
+  function icsDate(date) {
+    return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  }
+
+  function buildICS() {
+    var game = state.next;
+    if (!game) return null;
+    var end = new Date(game.start.getTime() + 3 * 60 * 60 * 1000);
+    var escape = function (text) {
+      return String(text).replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n");
+    };
+    var lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//GACHON WIND//Baseball Club//EN",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      "UID:gw-" + game.start.getTime() + "@gachonwind.club",
+      "DTSTAMP:" + icsDate(new Date()),
+      "DTSTART:" + icsDate(game.start),
+      "DTEND:" + icsDate(end),
+      "SUMMARY:" + escape("GACHON WIND vs " + pick(game.opponent)),
+      "LOCATION:" + escape(pick(game.venue)),
+      "DESCRIPTION:" + escape(t("schedule.icsDesc")),
+      "END:VEVENT",
+      "END:VCALENDAR"
+    ];
+    return lines.join("\r\n");
+  }
+
+  if (addCalendarButton) {
+    addCalendarButton.addEventListener("click", function () {
+      var ics = buildICS();
+      if (!ics) return;
+      var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.href = url;
+      link.download = "gachon-wind-next-game.ics";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    });
+  }
+
   /* ---------- Scroll reveal ---------- */
   var revealNodes = $$(".reveal");
   if ("IntersectionObserver" in window) {
