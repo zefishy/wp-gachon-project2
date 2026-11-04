@@ -11,6 +11,38 @@
 
   var CLUB_EMAIL = "gachonwind@gmail.com";
   var TIME_ZONE = "Asia/Seoul";
+
+  var FIXTURES = [
+    {
+      iso: "2026-11-14T14:00:00+09:00",
+      home: true,
+      opponent: { en: "Hanyang University" },
+      venue: { en: "Global Campus Field" },
+    },
+    {
+      iso: "2026-11-21T13:30:00+09:00",
+      home: false,
+      opponent: { en: "Kyung Hee University" },
+      venue: { en: "Kyung Hee Seoul Campus" },
+    },
+    {
+      iso: "2026-11-28T14:00:00+09:00",
+      home: true,
+      opponent: { en: "Dongguk University" },
+      venue: { en: "Global Campus Field" },
+    },
+    {
+      iso: "2026-12-05T14:00:00+09:00",
+      home: false,
+      opponent: { en: "Seoul National University" },
+      venue: { en: "SNU Sports Ground" },
+    },
+    {
+      iso: "2026-12-12T14:00:00+09:00",
+      home: true,
+      opponent: { en: "Yonsei University" },
+      venue: { en: "Global Campus Field" },
+    }
   ];
 
   var state = {
@@ -25,6 +57,15 @@
   /* ---------- Helpers ---------- */
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  function fmt(date, options) {
+    var opts = Object.assign({ timeZone: TIME_ZONE }, options || {});
+    return new Intl.DateTimeFormat(locale(), opts).format(date);
+  }
+
+  function timeOf(date) {
+    return fmt(date, { hour: "2-digit", minute: "2-digit", hour12: false });
+  }
 
   function pad(number) { return String(number).padStart(2, "0"); }
 
@@ -174,6 +215,110 @@
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+  }
+
+  /* ---------- Schedule ---------- */
+  var fixturesList = $("[data-fixtures]");
+  var fixturesEmpty = $("[data-fixtures-empty]");
+  var nextMatchNodes = $$("[data-next-opponent]");
+  var nextMetaNode = $("[data-next-meta]");
+  var nextBadgeNode = $("[data-next-badge]");
+  var heroNext = $("[data-hero-next]");
+  var heroNextMatch = $("[data-next-match]");
+  var heroNextWhen = $("[data-next-when]");
+  var heroNextCount = $("[data-next-count]");
+  var countdownEl = $("[data-countdown]");
+  var countdownDays = $("[data-count-days]");
+  var countdownHours = $("[data-count-hours]");
+  var countdownMins = $("[data-count-mins]");
+  var countdownSecs = $("[data-count-secs]");
+  var addCalendarButton = $("[data-add-calendar]");
+  var seasonComplete = false;
+
+  function upcomingGames() {
+    var now = Date.now();
+    return FIXTURES
+      .map(function (fixture) {
+        return {
+          iso: fixture.iso,
+          home: fixture.home,
+          opponent: fixture.opponent,
+          venue: fixture.venue,
+          start: new Date(fixture.iso),
+          stamp: new Date(fixture.iso).getTime()
+        };
+      })
+      .filter(function (fixture) { return fixture.stamp > now; })
+      .sort(function (a, b) { return a.stamp - b.stamp; });
+  }
+
+  function makeEl(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function renderSchedule() {
+    if (!fixturesList) return;
+    var games = upcomingGames();
+    fixturesList.innerHTML = "";
+
+    games.forEach(function (game) {
+      var date = game.start;
+      var item = makeEl("li", "fixture");
+
+      var dateWrap = makeEl("span", "fixture-date");
+      dateWrap.appendChild(makeEl("span", "fixture-day", fmt(date, { day: "numeric" })));
+      var md = makeEl("span", "fixture-md");
+      md.appendChild(makeEl("span", "", fmt(date, { month: "short" })));
+      md.appendChild(makeEl("span", "", fmt(date, { weekday: "short" })));
+      dateWrap.appendChild(md);
+
+      var opponent = makeEl("span", "fixture-opponent", pick(game.opponent));
+      var badge = makeEl("span", "badge" + (game.home ? "" : " is-away"), t(game.home ? "schedule.home" : "schedule.away"));
+      opponent.appendChild(badge);
+
+      item.appendChild(dateWrap);
+      item.appendChild(opponent);
+      item.appendChild(makeEl("span", "fixture-venue", pick(game.venue)));
+      item.appendChild(makeEl("span", "fixture-time", timeOf(date)));
+      fixturesList.appendChild(item);
+    });
+
+    if (fixturesEmpty) fixturesEmpty.hidden = games.length !== 0;
+
+    state.next = games[0] || null;
+    seasonComplete = !state.next;
+
+    if (state.next) {
+      var opponentName = pick(state.next.opponent);
+      var venueName = pick(state.next.venue);
+      var when = fmt(state.next.start, { weekday: "short", day: "numeric", month: "short", year: "numeric" }) +
+        " · " + timeOf(state.next.start) + " " + t("schedule.tz");
+
+      nextMatchNodes.forEach(function (node) { node.textContent = opponentName; });
+      if (nextMetaNode) nextMetaNode.textContent = when + " · " + venueName;
+      if (nextBadgeNode) {
+        nextBadgeNode.hidden = false;
+        nextBadgeNode.textContent = t(state.next.home ? "schedule.home" : "schedule.away");
+        nextBadgeNode.classList.toggle("is-away", !state.next.home);
+      }
+      if (heroNextMatch) heroNextMatch.textContent = "VS " + opponentName;
+      if (heroNextWhen) heroNextWhen.textContent = when;
+      if (heroNext) heroNext.hidden = false;
+      if (countdownEl) countdownEl.hidden = false;
+      if (addCalendarButton) addCalendarButton.disabled = false;
+    } else {
+      nextMatchNodes.forEach(function (node) { node.textContent = "—"; });
+      if (nextMetaNode) nextMetaNode.textContent = t("schedule.seasonOver");
+      if (nextBadgeNode) nextBadgeNode.hidden = true;
+      if (heroNext) heroNext.hidden = true;
+      if (countdownEl) countdownEl.hidden = true;
+      if (addCalendarButton) addCalendarButton.disabled = true;
+    }
+
+    updateCountdown();
   }
 
   /* ---------- Scroll reveal ---------- */
