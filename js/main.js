@@ -609,6 +609,97 @@
     field.addEventListener("input", function () { setFieldError(field, ""); });
   });
 
+  function experienceLabel(value) {
+    if (value === "team") return t("form.exp2");
+    if (value === "casual") return t("form.exp1");
+    return t("form.exp0");
+  }
+
+  function buildApplication() {
+    var experience = experienceField ? experienceField.value : "none";
+    return {
+      name: nameField.value.trim(),
+      studentId: studentField.value.trim(),
+      email: emailField.value.trim(),
+      experience: experienceLabel(experience),
+      lang: state.lang
+    };
+  }
+
+  function applicationText(app) {
+    return [
+      t("form.name") + ": " + app.name,
+      t("form.studentId") + ": " + app.studentId,
+      t("form.email") + ": " + app.email,
+      t("form.experience") + ": " + app.experience,
+      "Website language: " + app.lang
+    ].join("\r\n");
+  }
+
+  function mailtoHref(app) {
+    var subject = t("form.mailSubject", { name: app.name });
+    return "mailto:" + CLUB_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(applicationText(app));
+  }
+
+  function renderApplication() {
+    if (!state.app || !successBody) return;
+    successBody.textContent = t("form.successBody", { name: state.app.name });
+    if (mailtoLink) mailtoLink.setAttribute("href", mailtoHref(state.app));
+  }
+
+  if (form) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (!validateForm()) {
+        if (formError) {
+          formError.textContent = t("form.errSummary");
+          formError.hidden = false;
+        }
+        return;
+      }
+      state.app = buildApplication();
+      renderApplication();
+      if (formView) formView.hidden = true;
+      if (successView) successView.hidden = false;
+      if (copyStatus) copyStatus.textContent = "";
+      var sendButton = $("[data-mailto]");
+      if (sendButton) sendButton.focus();
+    });
+  }
+
+  if (copyButton) {
+    copyButton.addEventListener("click", function () {
+      if (!state.app) return;
+      var text = applicationText(state.app);
+      var done = function (ok) {
+        if (!copyStatus) return;
+        copyStatus.textContent = ok ? t("form.copied") : t("form.copyFailed");
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
+      } else {
+        done(fallbackCopy(text));
+      }
+    });
+  }
+
+  function fallbackCopy(text) {
+    try {
+      var area = document.createElement("textarea");
+      area.value = text;
+      area.setAttribute("readonly", "");
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(area);
+      return ok;
+    } catch (error) {
+      return false;
+    }
+  }
+
   /* ---------- Boot ---------- */
   $$("[data-lang-select]").forEach(function (select) {
     select.addEventListener("change", function () {
