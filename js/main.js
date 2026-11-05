@@ -490,6 +490,125 @@
     }
   });
 
+  /* ---------- Sign-up dialog ---------- */
+  var dialog = $("#signup");
+  var formView = $("[data-signup-form-view]");
+  var successView = $("[data-signup-success-view]");
+  var form = $("#signup-form");
+  var successBody = $("[data-success-body]");
+  var mailtoLink = $("[data-mailto]");
+  var copyButton = $("[data-copy]");
+  var copyStatus = $("[data-copy-status]");
+  var formError = $("[data-form-error]");
+  var lastFocus = null;
+
+  function openDialog() {
+    if (!dialog) return;
+    lastFocus = document.activeElement;
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
+    document.body.classList.add("is-locked");
+    if (formView) formView.hidden = false;
+    if (successView) successView.hidden = true;
+    var firstField = $("#f-name");
+    if (firstField) window.setTimeout(function () { firstField.focus(); }, 60);
+  }
+
+  function closeDialog() {
+    if (!dialog) return;
+    if (typeof dialog.close === "function") dialog.close();
+    else dialog.removeAttribute("open");
+    document.body.classList.remove("is-locked");
+    if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+  }
+
+  $$("[data-open-signup]").forEach(function (button) {
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      openDialog();
+    });
+  });
+
+  $$("[data-close-signup]").forEach(function (button) {
+    button.addEventListener("click", closeDialog);
+  });
+
+  if (dialog) {
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog) closeDialog();
+    });
+    dialog.addEventListener("close", function () {
+      document.body.classList.remove("is-locked");
+      if (form) form.reset();
+      if (formView) formView.hidden = false;
+      if (successView) successView.hidden = true;
+      if (copyStatus) copyStatus.textContent = "";
+      state.app = null;
+      clearFormErrors();
+    });
+  }
+
+  var nameField = $("#f-name");
+  var studentField = $("#f-student");
+  var emailField = $("#f-email");
+  var experienceField = $("#f-exp");
+  var requiredFields = [nameField, studentField, emailField].filter(Boolean);
+
+  function fieldError(field) {
+    return document.querySelector('[data-error-for="' + field.id + '"]');
+  }
+
+  function setFieldError(field, message) {
+    var node = fieldError(field);
+    field.setAttribute("aria-invalid", message ? "true" : "false");
+    if (!node) return;
+    node.textContent = message || "";
+    node.hidden = !message;
+  }
+
+  function clearFormErrors() {
+    requiredFields.forEach(function (field) {
+      setFieldError(field, "");
+      field.removeAttribute("aria-invalid");
+    });
+    if (formError) {
+      formError.textContent = "";
+      formError.hidden = true;
+    }
+  }
+
+  function emailLooksValid(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  function validateForm() {
+    clearFormErrors();
+    var firstInvalid = null;
+    var problems = 0;
+
+    requiredFields.forEach(function (field) {
+      var value = field.value.trim();
+      var message = "";
+      if (!value) message = t("form.errRequired");
+      else if (field.type === "email" && !emailLooksValid(value)) message = t("form.errEmail");
+      if (message) {
+        setFieldError(field, message);
+        problems += 1;
+        if (!firstInvalid) firstInvalid = field;
+      }
+    });
+
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return false;
+    }
+    return true;
+  }
+
+  requiredFields.forEach(function (field) {
+    field.addEventListener("input", function () { setFieldError(field, ""); });
+  });
+
   /* ---------- Boot ---------- */
   $$("[data-lang-select]").forEach(function (select) {
     select.addEventListener("change", function () {

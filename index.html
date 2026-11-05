@@ -529,6 +529,68 @@
     <p class="lb-count" id="lb-count" aria-hidden="true"></p>
   </div>
 
+  <!-- SIGN-UP DIALOG -->
+  <dialog class="signup" id="signup" aria-labelledby="signup-title">
+    <div class="signup-shell">
+      <button class="signup-close" type="button" data-close-signup aria-label="Close" data-i18n-attr="aria-label:form.close">×</button>
+
+      <div data-signup-form-view>
+        <p class="kicker"><span class="kicker-mark" aria-hidden="true"></span><span data-i18n="modal.kicker">Sign up</span></p>
+        <h2 class="signup-title" id="signup-title" data-i18n="modal.title">Join GACHON WIND</h2>
+        <p class="signup-sub" data-i18n="modal.sub">Four quick fields. We reply within three days.</p>
+
+        <form class="signup-form" id="signup-form" novalidate>
+          <div class="field">
+            <label for="f-name"><span data-i18n="form.name">Name</span><span class="req" aria-hidden="true">*</span></label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required aria-describedby="f-name-error" data-i18n-attr="placeholder:form.namePh">
+            <p class="field-error" id="f-name-error" data-error-for="f-name" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-student"><span data-i18n="form.studentId">Student ID</span><span class="req" aria-hidden="true">*</span></label>
+            <input id="f-student" name="studentId" type="text" inputmode="numeric" autocomplete="off" required aria-describedby="f-student-error" data-i18n-attr="placeholder:form.studentIdPh">
+            <p class="field-error" id="f-student-error" data-error-for="f-student" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-email"><span data-i18n="form.email">Email</span><span class="req" aria-hidden="true">*</span></label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required aria-describedby="f-email-error" data-i18n-attr="placeholder:form.emailPh">
+            <p class="field-error" id="f-email-error" data-error-for="f-email" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-exp"><span data-i18n="form.experience">Baseball experience</span></label>
+            <select id="f-exp" name="experience">
+              <option value="none" data-i18n="form.exp0">Never played</option>
+              <option value="casual" data-i18n="form.exp1">Played casually</option>
+              <option value="team" data-i18n="form.exp2">Played in a team</option>
+            </select>
+          </div>
+          <p class="form-error" data-form-error role="alert" hidden></p>
+          <button class="btn btn-primary" type="submit">
+            <span data-i18n="form.submit">Build my application</span>
+            <span class="btn-arrow" aria-hidden="true">→</span>
+          </button>
+          <p class="form-note" data-i18n="form.note">Your application opens in your email app. Nothing is sent automatically.</p>
+        </form>
+      </div>
+
+      <div class="signup-success" data-signup-success-view hidden>
+        <p class="kicker"><span class="kicker-mark" aria-hidden="true"></span><span data-i18n="form.successKicker">Ready to send</span></p>
+        <h2 class="signup-title" data-i18n="form.successTitle">Almost done.</h2>
+        <p class="signup-sub" data-success-body></p>
+        <div class="success-actions">
+          <a class="btn btn-primary" data-mailto href="#">
+            <span data-i18n="form.send">Send by email</span>
+            <span aria-hidden="true">→</span>
+          </a>
+          <button class="btn btn-ghost" type="button" data-copy>
+            <span data-i18n="form.copy">Copy details</span>
+          </button>
+        </div>
+        <p class="copy-status" data-copy-status aria-live="polite"></p>
+        <button class="link-btn" type="button" data-close-signup data-i18n="form.close">Close</button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
 </body>
