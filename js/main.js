@@ -16,32 +16,32 @@
     {
       iso: "2026-11-14T14:00:00+09:00",
       home: true,
-      opponent: { en: "Hanyang University" },
-      venue: { en: "Global Campus Field" },
+      opponent: { en: "Hanyang University", ko: "한양대학교", vi: "Đại học Hanyang", ja: "漢陽大学", zh: "汉阳大学" },
+      venue: { en: "Global Campus Field", ko: "글로벌캠퍼스 운동장", vi: "Sân Cơ sở Global", ja: "グローバルキャンパス・グラウンド", zh: "全球校区球场" }
     },
     {
       iso: "2026-11-21T13:30:00+09:00",
       home: false,
-      opponent: { en: "Kyung Hee University" },
-      venue: { en: "Kyung Hee Seoul Campus" },
+      opponent: { en: "Kyung Hee University", ko: "경희대학교", vi: "Đại học Kyung Hee", ja: "慶熙大学", zh: "庆熙大学" },
+      venue: { en: "Kyung Hee Seoul Campus", ko: "경희대 서울캠퍼스", vi: "Cơ sở Seoul, ĐH Kyung Hee", ja: "慶熙大学ソウルキャンパス", zh: "庆熙大学首尔校区" }
     },
     {
       iso: "2026-11-28T14:00:00+09:00",
       home: true,
-      opponent: { en: "Dongguk University" },
-      venue: { en: "Global Campus Field" },
+      opponent: { en: "Dongguk University", ko: "동국대학교", vi: "Đại học Dongguk", ja: "東国大学", zh: "东国大学" },
+      venue: { en: "Global Campus Field", ko: "글로벌캠퍼스 운동장", vi: "Sân Cơ sở Global", ja: "グローバルキャンパス・グラウンド", zh: "全球校区球场" }
     },
     {
       iso: "2026-12-05T14:00:00+09:00",
       home: false,
-      opponent: { en: "Seoul National University" },
-      venue: { en: "SNU Sports Ground" },
+      opponent: { en: "Seoul National University", ko: "서울대학교", vi: "Đại học Quốc gia Seoul", ja: "ソウル大学", zh: "首尔大学" },
+      venue: { en: "SNU Sports Ground", ko: "서울대학교 운동장", vi: "Sân ĐH Quốc gia Seoul", ja: "ソウル大学グラウンド", zh: "首尔大学运动场" }
     },
     {
       iso: "2026-12-12T14:00:00+09:00",
       home: true,
-      opponent: { en: "Yonsei University" },
-      venue: { en: "Global Campus Field" },
+      opponent: { en: "Yonsei University", ko: "연세대학교", vi: "Đại học Yonsei", ja: "延世大学", zh: "延世大学" },
+      venue: { en: "Global Campus Field", ko: "글로벌캠퍼스 운동장", vi: "Sân Cơ sở Global", ja: "グローバルキャンパス・グラウンド", zh: "全球校区球场" }
     }
   ];
 
