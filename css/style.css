@@ -1798,6 +1798,67 @@ html {
     --placeholder var(--theme-dur) var(--theme-ease);
 }
 
+/* ---------- CJK typography ----------
+   Anton has no Hangul / Kana, so translated display type falls back to the
+   system CJK sans at a heavy weight instead of a thin 400. */
+html[lang="ko"] body { word-break: keep-all; }
+html[lang="ja"] body { line-break: strict; }
+
+html[lang="ko"] .display,
+html[lang="ja"] .display,
+html[lang="zh"] .display {
+  font-family: var(--sans);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.14;
+}
+html[lang="ko"] .subhead,
+html[lang="ja"] .subhead,
+html[lang="zh"] .subhead,
+html[lang="ko"] .activity h4,
+html[lang="ja"] .activity h4,
+html[lang="zh"] .activity h4,
+html[lang="ko"] .value h3,
+html[lang="ja"] .value h3,
+html[lang="zh"] .value h3,
+html[lang="ko"] .steps h3,
+html[lang="ja"] .steps h3,
+html[lang="zh"] .steps h3,
+html[lang="ko"] .signup-title,
+html[lang="ja"] .signup-title,
+html[lang="zh"] .signup-title,
+html[lang="ko"] .practice-days,
+html[lang="ja"] .practice-days,
+html[lang="zh"] .practice-days,
+html[lang="ko"] .mobile-nav a,
+html[lang="ja"] .mobile-nav a,
+html[lang="zh"] .mobile-nav a,
+html[lang="ko"] [data-next-opponent],
+html[lang="ja"] [data-next-opponent],
+html[lang="zh"] [data-next-opponent],
+html[lang="ko"] .hero-next-match,
+html[lang="ja"] .hero-next-match,
+html[lang="zh"] .hero-next-match {
+  font-family: var(--sans);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+html[lang="ko"] .next-match,
+html[lang="ja"] .next-match,
+html[lang="zh"] .next-match { line-height: 1.35; }
+html[lang="ko"] .value h3,
+html[lang="ja"] .value h3,
+html[lang="zh"] .value h3 { line-height: 1.3; }
+html[lang="ko"] .join .display,
+html[lang="ja"] .join .display { line-height: 1.18; }
+html[lang="ko"] .club-copy .lead { max-width: 34ch; }
+html[lang="ko"] .hero-lead { max-width: 48ch; }
+html[lang="zh"] .hero-lead { max-width: 52ch; }
+html[lang="zh"] .club-copy p + p { max-width: 46ch; }
+html[lang="zh"] .value p,
+html[lang="zh"] .activity p { max-width: 30em; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1180px) {
   .primary-nav { gap: 16px; }
