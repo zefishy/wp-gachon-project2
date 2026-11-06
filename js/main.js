@@ -58,6 +58,28 @@
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
 
+  function t(key, vars) {
+    var dict = window.GW_I18N[state.lang] || window.GW_I18N.en;
+    var value = dict[key];
+    if (value === undefined) value = window.GW_I18N.en[key];
+    if (value === undefined) return key;
+    if (vars) {
+      Object.keys(vars).forEach(function (name) {
+        value = value.replace(new RegExp("\\{" + name + "\\}", "g"), vars[name]);
+      });
+    }
+    return value;
+  }
+
+  function pick(value) {
+    if (value && typeof value === "object") return value[state.lang] || value.en;
+    return value;
+  }
+
+  function locale() {
+    return (window.GW_LOCALES[state.lang] || window.GW_LOCALES.en).locale;
+  }
+
   function fmt(date, options) {
     var opts = Object.assign({ timeZone: TIME_ZONE }, options || {});
     return new Intl.DateTimeFormat(locale(), opts).format(date);
@@ -76,6 +98,57 @@
   function readStore(key) {
     try { return window.localStorage.getItem(key); } catch (error) { return null; }
   }
+
+  /* ---------- Language ----------
+     Matches the visitor's browser locale to the first supported language.
+     Only the primary subtag is compared, so "zh-CN", "zh-TW" and "zh-Hans"
+     all select the Simplified Chinese dictionary. */
+  function detectLanguage() {
+    var saved = readStore("gw-lang");
+    if (saved && window.GW_I18N[saved]) return saved;
+    var candidates = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"];
+    for (var i = 0; i < candidates.length; i += 1) {
+      var code = String(candidates[i]).slice(0, 2).toLowerCase();
+      if (window.GW_I18N[code]) return code;
+    }
+    return "en";
+  }
+
+  function setLanguage(lang, persist) {
+    if (!window.GW_I18N[lang]) lang = "en";
+    state.lang = lang;
+    if (persist !== false) store("gw-lang", lang);
+    document.documentElement.lang = lang;
+    document.title = t("meta.title");
+
+    $$("[data-i18n]").forEach(function (node) {
+      node.textContent = t(node.getAttribute("data-i18n"));
+    });
+
+    $$("[data-i18n-html]").forEach(function (node) {
+      node.innerHTML = t(node.getAttribute("data-i18n-html"));
+    });
+
+    $$("[data-i18n-attr]").forEach(function (node) {
+      node.getAttribute("data-i18n-attr").split(",").forEach(function (pair) {
+        var bits = pair.split(":");
+        var attr = bits.shift().trim();
+        var key = bits.join(":").trim();
+        node.setAttribute(attr, t(key));
+      });
+    });
+
+    $$("[data-lang-select]").forEach(function (select) {
+      select.value = lang;
+    });
+
+    renderSchedule();
+    if (state.app) renderApplication();
+    updateMenuLabel();
+    updateThemeControls();
+    updateLightbox();
+  }
+
   /* ---------- Theme (dark · light) ----------
      The saved choice wins; otherwise the page follows prefers-color-scheme
      and keeps following it until the visitor toggles. The <html data-theme>
