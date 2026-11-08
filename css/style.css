@@ -1804,6 +1804,14 @@ html {
 html[lang="ko"] body { word-break: keep-all; }
 html[lang="ja"] body { line-break: strict; }
 
+/* ---------- Vietnamese typography ----------
+   Anton's Vietnamese subset draws stacked tone marks (Ậ, Ợ, Ỹ…) that reach
+   ~1.37em of ink height against ~0.88em for plain caps, so the Latin display
+   leading (0.93) makes adjacent lines collide. Vietnamese display type gets
+   its own leading, and next-match lines get safe leading in case they wrap. */
+html[lang="vi"] .display { line-height: 1.45; }
+html[lang="vi"] .next-match { line-height: 1.3; }
+
 html[lang="ko"] .display,
 html[lang="ja"] .display,
 html[lang="zh"] .display {
@@ -1838,7 +1846,13 @@ html[lang="ja"] [data-next-opponent],
 html[lang="zh"] [data-next-opponent],
 html[lang="ko"] .hero-next-match,
 html[lang="ja"] .hero-next-match,
-html[lang="zh"] .hero-next-match {
+html[lang="zh"] .hero-next-match,
+html[lang="ko"] .hero-sub,
+html[lang="ja"] .hero-sub,
+html[lang="zh"] .hero-sub,
+html[lang="ko"] .fixture-day,
+html[lang="ja"] .fixture-day,
+html[lang="zh"] .fixture-day {
   font-family: var(--sans);
   font-weight: 800;
   letter-spacing: 0;
