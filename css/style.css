@@ -866,12 +866,19 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
 .ticker-track {
   display: flex;
   align-items: center;
-  gap: 32px;
   width: max-content;
-  animation: marquee 34s linear infinite;
+  animation: marquee 135s linear infinite;
+}
+/* Two identical halves; the trailing padding equals the internal gap, so the
+   -50% keyframe lands the second half exactly where the first one started. */
+.ticker-group {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding-right: 32px;
 }
 .ticker:hover .ticker-track { animation-play-state: paused; }
-.ticker-track > span:not(.ticker-dot) {
+.ticker-group > span:not(.ticker-dot) {
   font-family: var(--display);
   font-size: 17px;
   letter-spacing: 0.04em;
@@ -1716,7 +1723,8 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
 }
 .req { color: var(--red); }
 .field input,
-.field select {
+.field select,
+.field textarea {
   width: 100%;
   padding: 11px 12px;
   border: 1px solid var(--line-strong);
@@ -1726,10 +1734,14 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
   font-family: var(--sans);
   font-size: 15px;
 }
-.field input::placeholder { color: var(--placeholder); opacity: 1; }
+.field textarea { resize: vertical; min-height: 88px; }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--placeholder); opacity: 1; }
 .field input:focus-visible,
-.field select:focus-visible { outline: 2px solid var(--blue); outline-offset: 0; }
-.field input[aria-invalid="true"] { border-color: var(--danger); background: var(--danger-field); }
+.field select:focus-visible,
+.field textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 0; }
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] { border-color: var(--danger); background: var(--danger-field); }
 .field-error { margin-top: 5px; color: var(--danger); font-size: 11.5px; }
 .form-error { padding: 9px 11px; border-left: 3px solid var(--danger); background: var(--danger-soft); color: var(--danger-ink); font-size: 12px; }
 .form-note { color: var(--muted); font-size: 11px; line-height: 1.5; }

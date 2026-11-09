@@ -73,7 +73,7 @@
           </select>
           <span class="lang-select-chevron" aria-hidden="true"></span>
         </div>
-        <a class="btn btn-primary btn-sm header-cta" href="#join" data-i18n="nav.signup">Sign up</a>
+        <a class="btn btn-primary btn-sm header-cta" href="#join" data-open-signup data-i18n="nav.signup">Sign up</a>
         <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" data-i18n-attr="aria-label:nav.menu">
           <span></span><span></span>
         </button>
@@ -97,7 +97,7 @@
       <a class="menu-ig" href="https://www.instagram.com/gcu_wind" target="_blank" rel="noopener">@GCU_WIND</a>
     </div>
     <div class="mobile-actions">
-      <a class="btn btn-primary" href="#join" data-i18n="nav.signup">Sign up</a>
+      <a class="btn btn-primary" href="#join" data-open-signup data-i18n="nav.signup">Sign up</a>
       <div class="mobile-actions-row">
         <button class="theme-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme" title="Switch to dark theme">
           <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -175,14 +175,42 @@
     <!-- TICKER -->
     <div class="ticker" aria-hidden="true">
       <div class="ticker-track">
-        <span>PLAY BALL</span><span class="ticker-dot"></span>
-        <span>GACHON WIND</span><span class="ticker-dot"></span>
-        <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
-        <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
-        <span>PLAY BALL</span><span class="ticker-dot"></span>
-        <span>GACHON WIND</span><span class="ticker-dot"></span>
-        <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
-        <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+        <div class="ticker-group">
+          <span>PLAY BALL</span><span class="ticker-dot"></span>
+          <span>GACHON WIND</span><span class="ticker-dot"></span>
+          <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
+          <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+          <span>PLAY BALL</span><span class="ticker-dot"></span>
+          <span>GACHON WIND</span><span class="ticker-dot"></span>
+          <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
+          <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+          <span>PLAY BALL</span><span class="ticker-dot"></span>
+          <span>GACHON WIND</span><span class="ticker-dot"></span>
+          <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
+          <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+          <span>PLAY BALL</span><span class="ticker-dot"></span>
+          <span>GACHON WIND</span><span class="ticker-dot"></span>
+          <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
+          <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+        </div>
+        <div class="ticker-group">
+          <span>PLAY BALL</span><span class="ticker-dot"></span>
+          <span>GACHON WIND</span><span class="ticker-dot"></span>
+          <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
+          <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+          <span>PLAY BALL</span><span class="ticker-dot"></span>
+          <span>GACHON WIND</span><span class="ticker-dot"></span>
+          <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
+          <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+          <span>PLAY BALL</span><span class="ticker-dot"></span>
+          <span>GACHON WIND</span><span class="ticker-dot"></span>
+          <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
+          <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+          <span>PLAY BALL</span><span class="ticker-dot"></span>
+          <span>GACHON WIND</span><span class="ticker-dot"></span>
+          <span>BASEBALL CLUB</span><span class="ticker-dot"></span>
+          <span>SEONGNAM · KOREA</span><span class="ticker-dot"></span>
+        </div>
       </div>
     </div>
 
@@ -562,6 +590,11 @@
               <option value="casual" data-i18n="form.exp1">Played casually</option>
               <option value="team" data-i18n="form.exp2">Played in a team</option>
             </select>
+          </div>
+          <div class="field">
+            <label for="f-reason"><span data-i18n="form.reason">Reason for joining</span><span class="req" aria-hidden="true">*</span></label>
+            <textarea id="f-reason" name="reason" rows="3" maxlength="500" required aria-describedby="f-reason-error" placeholder="Tell us why you want to join — a sentence is plenty." data-i18n-attr="placeholder:form.reasonPh"></textarea>
+            <p class="field-error" id="f-reason-error" data-error-for="f-reason" hidden></p>
           </div>
           <p class="form-error" data-form-error role="alert" hidden></p>
           <button class="btn btn-primary" type="submit">

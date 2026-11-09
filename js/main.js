@@ -624,8 +624,9 @@
   var nameField = $("#f-name");
   var studentField = $("#f-student");
   var emailField = $("#f-email");
+  var reasonField = $("#f-reason");
   var experienceField = $("#f-exp");
-  var requiredFields = [nameField, studentField, emailField].filter(Boolean);
+  var requiredFields = [nameField, studentField, emailField, reasonField].filter(Boolean);
 
   function fieldError(field) {
     return document.querySelector('[data-error-for="' + field.id + '"]');
@@ -664,6 +665,7 @@
       var message = "";
       if (!value) message = t("form.errRequired");
       else if (field.type === "email" && !emailLooksValid(value)) message = t("form.errEmail");
+      else if (field === studentField && !/^\d{9}$/.test(value)) message = t("form.errStudentId");
       if (message) {
         setFieldError(field, message);
         problems += 1;
@@ -694,6 +696,7 @@
       name: nameField.value.trim(),
       studentId: studentField.value.trim(),
       email: emailField.value.trim(),
+      reason: reasonField ? reasonField.value.trim() : "",
       experience: experienceLabel(experience),
       lang: state.lang
     };
@@ -705,7 +708,8 @@
       t("form.studentId") + ": " + app.studentId,
       t("form.email") + ": " + app.email,
       t("form.experience") + ": " + app.experience,
-      "Website language: " + app.lang
+      t("form.reason") + ": " + app.reason,
+      t("form.langLabel") + ": " + app.lang
     ].join("\r\n");
   }
 
