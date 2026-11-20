@@ -319,16 +319,31 @@
           </div>
         </div>
 
-        <div class="fixtures">
-          <div class="fixtures-head" aria-hidden="true">
-            <span data-i18n="schedule.date">Date</span>
-            <span data-i18n="schedule.opponent">Opponent</span>
-            <span data-i18n="schedule.venue">Venue</span>
-            <span data-i18n="schedule.time">Time</span>
+        <div class="calendar reveal" data-calendar>
+          <div class="cal-main">
+            <div class="cal-toolbar">
+              <h3 class="cal-month" data-cal-month aria-live="polite">—</h3>
+              <div class="cal-nav-group">
+                <button class="cal-nav" type="button" data-cal-prev aria-label="Previous month" data-i18n-attr="aria-label:schedule.prevMonth">
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+                <button class="cal-nav" type="button" data-cal-next aria-label="Next month" data-i18n-attr="aria-label:schedule.nextMonth">
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="cal-weekdays" data-cal-weekdays aria-hidden="true"></div>
+            <div class="cal-grid" data-cal-grid></div>
+            <ul class="cal-legend" aria-hidden="true">
+              <li class="cal-key is-home" data-i18n="schedule.home">Home</li>
+              <li class="cal-key is-away" data-i18n="schedule.away">Away</li>
+              <li class="cal-key is-next" data-i18n="schedule.nextLabel">Next game</li>
+              <li class="cal-key is-today" data-i18n="schedule.today">Today</li>
+            </ul>
           </div>
-          <ol class="fixtures-list" data-fixtures></ol>
-          <p class="fixtures-empty" data-fixtures-empty hidden data-i18n="schedule.empty">The next season's fixtures are being confirmed. Check back soon.</p>
+          <aside class="cal-detail" data-cal-detail aria-live="polite"></aside>
         </div>
+        <p class="fixtures-empty" data-fixtures-empty hidden data-i18n="schedule.empty">The next season's fixtures are being confirmed. Check back soon.</p>
         <p class="footnote" data-i18n="schedule.footnote">Friendly and league fixtures. Times are Korea Standard Time (KST) and may change — follow @GCU_WIND for updates.</p>
       </div>
     </section>

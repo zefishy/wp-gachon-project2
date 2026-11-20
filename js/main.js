@@ -4,6 +4,9 @@
 
    EDIT ME: the fixtures below are sample data for the proposal demo.
    Replace opponents, venues and dates with the real season.
+   Each fixture's `logo` points at a crest in static/img/teams/ — the ones
+   shipped here are placeholder monograms; swap in official logos (with the
+   other club's permission) by replacing those files.
    ========================================================================== */
 
 (function () {
@@ -16,30 +19,40 @@
     {
       iso: "2026-11-14T14:00:00+09:00",
       home: true,
+      short: "HYU",
+      logo: "static/img/teams/hanyang.svg",
       opponent: { en: "Hanyang University", ko: "한양대학교", vi: "Đại học Hanyang", ja: "漢陽大学", zh: "汉阳大学" },
       venue: { en: "Global Campus Field", ko: "글로벌캠퍼스 운동장", vi: "Sân Cơ sở Global", ja: "グローバルキャンパス・グラウンド", zh: "全球校区球场" }
     },
     {
       iso: "2026-11-21T13:30:00+09:00",
       home: false,
+      short: "KHU",
+      logo: "static/img/teams/kyunghee.svg",
       opponent: { en: "Kyung Hee University", ko: "경희대학교", vi: "Đại học Kyung Hee", ja: "慶熙大学", zh: "庆熙大学" },
       venue: { en: "Kyung Hee Seoul Campus", ko: "경희대 서울캠퍼스", vi: "Cơ sở Seoul, ĐH Kyung Hee", ja: "慶熙大学ソウルキャンパス", zh: "庆熙大学首尔校区" }
     },
     {
       iso: "2026-11-28T14:00:00+09:00",
       home: true,
+      short: "DGU",
+      logo: "static/img/teams/dongguk.svg",
       opponent: { en: "Dongguk University", ko: "동국대학교", vi: "Đại học Dongguk", ja: "東国大学", zh: "东国大学" },
       venue: { en: "Global Campus Field", ko: "글로벌캠퍼스 운동장", vi: "Sân Cơ sở Global", ja: "グローバルキャンパス・グラウンド", zh: "全球校区球场" }
     },
     {
       iso: "2026-12-05T14:00:00+09:00",
       home: false,
+      short: "SNU",
+      logo: "static/img/teams/snu.svg",
       opponent: { en: "Seoul National University", ko: "서울대학교", vi: "Đại học Quốc gia Seoul", ja: "ソウル大学", zh: "首尔大学" },
       venue: { en: "SNU Sports Ground", ko: "서울대학교 운동장", vi: "Sân ĐH Quốc gia Seoul", ja: "ソウル大学グラウンド", zh: "首尔大学运动场" }
     },
     {
       iso: "2026-12-12T14:00:00+09:00",
       home: true,
+      short: "YSU",
+      logo: "static/img/teams/yonsei.svg",
       opponent: { en: "Yonsei University", ko: "연세대학교", vi: "Đại học Yonsei", ja: "延世大学", zh: "延世大学" },
       venue: { en: "Global Campus Field", ko: "글로벌캠퍼스 운동장", vi: "Sân Cơ sở Global", ja: "グローバルキャンパス・グラウンド", zh: "全球校区球场" }
     }
@@ -51,7 +64,9 @@
     next: null,
     app: null,
     countdownTimer: null,
-    lastLightboxIndex: 0
+    lastLightboxIndex: 0,
+    calMonth: null,
+    selected: null
   };
 
   /* ---------- Helpers ---------- */
@@ -291,7 +306,13 @@
   }
 
   /* ---------- Schedule ---------- */
-  var fixturesList = $("[data-fixtures]");
+  var calendarRoot = $("[data-calendar]");
+  var calGrid = $("[data-cal-grid]");
+  var calWeekdays = $("[data-cal-weekdays]");
+  var calMonthLabel = $("[data-cal-month]");
+  var calPrev = $("[data-cal-prev]");
+  var calNext = $("[data-cal-next]");
+  var calDetail = $("[data-cal-detail]");
   var fixturesEmpty = $("[data-fixtures-empty]");
   var nextMatchNodes = $$("[data-next-opponent]");
   var nextMetaNode = $("[data-next-meta]");
@@ -308,21 +329,42 @@
   var addCalendarButton = $("[data-add-calendar]");
   var seasonComplete = false;
 
-  function upcomingGames() {
-    var now = Date.now();
+  /* Calendar days are always Seoul days, whatever the visitor's own zone. */
+  var KEY_FORMAT = new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" });
+
+  function dayKey(date) {
+    var parts = {};
+    KEY_FORMAT.formatToParts(date).forEach(function (part) { parts[part.type] = part.value; });
+    return parts.year + "-" + parts.month + "-" + parts.day;
+  }
+
+  /* Months as a single counter (year * 12 + month) so prev/next is ±1. */
+  function monthIndexOf(key) {
+    return Number(key.slice(0, 4)) * 12 + Number(key.slice(5, 7)) - 1;
+  }
+
+  function allGames() {
     return FIXTURES
       .map(function (fixture) {
+        var start = new Date(fixture.iso);
         return {
           iso: fixture.iso,
           home: fixture.home,
+          short: fixture.short,
+          logo: fixture.logo,
           opponent: fixture.opponent,
           venue: fixture.venue,
-          start: new Date(fixture.iso),
-          stamp: new Date(fixture.iso).getTime()
+          start: start,
+          stamp: start.getTime(),
+          key: dayKey(start)
         };
       })
-      .filter(function (fixture) { return fixture.stamp > now; })
       .sort(function (a, b) { return a.stamp - b.stamp; });
+  }
+
+  function upcomingGames() {
+    var now = Date.now();
+    return allGames().filter(function (game) { return game.stamp > now; });
   }
 
   function makeEl(tag, className, text) {
@@ -332,35 +374,257 @@
     return node;
   }
 
-  function renderSchedule() {
-    if (!fixturesList) return;
-    var games = upcomingGames();
-    fixturesList.innerHTML = "";
+  function makeLogo(src, className) {
+    var img = makeEl("img", className);
+    img.src = src;
+    img.alt = "";
+    img.width = 64;
+    img.height = 64;
+    img.decoding = "async";
+    return img;
+  }
 
-    games.forEach(function (game) {
-      var date = game.start;
-      var item = makeEl("li", "fixture");
+  function gameStatus(game) {
+    if (game.stamp <= Date.now()) return "played";
+    if (state.next && state.next.iso === game.iso) return "next";
+    return "upcoming";
+  }
 
-      var dateWrap = makeEl("span", "fixture-date");
-      dateWrap.appendChild(makeEl("span", "fixture-day", fmt(date, { day: "numeric" })));
-      var md = makeEl("span", "fixture-md");
-      md.appendChild(makeEl("span", "", fmt(date, { month: "short" })));
-      md.appendChild(makeEl("span", "", fmt(date, { weekday: "short" })));
-      dateWrap.appendChild(md);
+  function statusLabel(status) {
+    if (status === "played") return t("schedule.played");
+    if (status === "next") return t("schedule.nextLabel");
+    return t("schedule.upcoming");
+  }
 
-      var opponent = makeEl("span", "fixture-opponent", pick(game.opponent));
-      var badge = makeEl("span", "badge" + (game.home ? "" : " is-away"), t(game.home ? "schedule.home" : "schedule.away"));
-      opponent.appendChild(badge);
+  function selectGame(game, focusCell) {
+    state.selected = game.iso;
+    state.calMonth = monthIndexOf(game.key);
+    renderCalendar();
+    if (focusCell && calGrid) {
+      var cell = calGrid.querySelector('[data-game="' + game.iso + '"]');
+      if (cell) cell.focus();
+    }
+  }
 
-      item.appendChild(dateWrap);
-      item.appendChild(opponent);
-      item.appendChild(makeEl("span", "fixture-venue", pick(game.venue)));
-      item.appendChild(makeEl("span", "fixture-time", timeOf(date)));
-      fixturesList.appendChild(item);
-    });
-
+  function renderCalendar() {
+    if (!calendarRoot) return;
+    var games = allGames();
+    calendarRoot.hidden = games.length === 0;
     if (fixturesEmpty) fixturesEmpty.hidden = games.length !== 0;
+    if (!games.length) return;
 
+    var focusGame = state.next || games[games.length - 1];
+    var firstMonth = monthIndexOf(games[0].key);
+    var lastMonth = monthIndexOf(games[games.length - 1].key);
+    if (state.calMonth === null) state.calMonth = monthIndexOf(focusGame.key);
+    state.calMonth = Math.min(lastMonth, Math.max(firstMonth, state.calMonth));
+    if (!games.some(function (game) { return game.iso === state.selected; })) state.selected = focusGame.iso;
+
+    var year = Math.floor(state.calMonth / 12);
+    var month = state.calMonth % 12;
+
+    /* Noon UTC on the 15th lands inside the same month in any zone. */
+    if (calMonthLabel) calMonthLabel.textContent = fmt(new Date(Date.UTC(year, month, 15, 12)), { month: "long", year: "numeric" });
+    if (calPrev) calPrev.disabled = state.calMonth <= firstMonth;
+    if (calNext) calNext.disabled = state.calMonth >= lastMonth;
+
+    if (calWeekdays) {
+      calWeekdays.innerHTML = "";
+      for (var w = 0; w < 7; w += 1) {
+        var ref = new Date(Date.UTC(1970, 0, 4 + w, 12)); /* 4 Jan 1970 was a Sunday */
+        var head = makeEl("span", "cal-weekday" + (w === 0 || w === 6 ? " is-weekend" : ""));
+        head.appendChild(makeEl("span", "cal-weekday-short", fmt(ref, { weekday: "short" })));
+        head.appendChild(makeEl("span", "cal-weekday-narrow", fmt(ref, { weekday: "narrow" })));
+        calWeekdays.appendChild(head);
+      }
+    }
+
+    var byKey = {};
+    games.forEach(function (game) { byKey[game.key] = game; });
+    var todayKey = dayKey(new Date());
+    var lead = new Date(Date.UTC(year, month, 1)).getUTCDay();
+    var daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    var cells = Math.ceil((lead + daysInMonth) / 7) * 7;
+
+    calGrid.innerHTML = "";
+    for (var i = 0; i < cells; i += 1) {
+      var day = i - lead + 1;
+      if (day < 1 || day > daysInMonth) {
+        calGrid.appendChild(makeEl("div", "cal-cell is-blank"));
+        continue;
+      }
+      var key = year + "-" + pad(month + 1) + "-" + pad(day);
+      var game = byKey[key];
+      var classes = ["cal-cell"];
+      if (i % 7 === 0 || i % 7 === 6) classes.push("is-weekend");
+      if (key === todayKey) classes.push("is-today");
+
+      if (!game) {
+        var plain = makeEl("div", classes.join(" "));
+        plain.appendChild(makeEl("span", "cal-num", String(day)));
+        calGrid.appendChild(plain);
+        continue;
+      }
+
+      var status = gameStatus(game);
+      var selected = game.iso === state.selected;
+      classes.push("has-game", game.home ? "is-home" : "is-away", "is-" + status);
+      if (selected) classes.push("is-selected");
+
+      var cell = makeEl("button", classes.join(" "));
+      cell.type = "button";
+      cell.setAttribute("data-game", game.iso);
+      cell.setAttribute("aria-pressed", selected ? "true" : "false");
+      cell.setAttribute("aria-label", [
+        fmt(game.start, { weekday: "long", day: "numeric", month: "long" }),
+        "GACHON WIND vs " + pick(game.opponent),
+        t(game.home ? "schedule.home" : "schedule.away"),
+        timeOf(game.start) + " " + t("schedule.tz"),
+        pick(game.venue),
+        statusLabel(status)
+      ].join(", "));
+
+      var top = makeEl("span", "cal-cell-top");
+      top.appendChild(makeEl("span", "cal-num", String(day)));
+      if (status !== "upcoming") top.appendChild(makeEl("span", "cal-flag", statusLabel(status)));
+      cell.appendChild(top);
+
+      var crest = makeEl("span", "cal-crest");
+      crest.appendChild(makeLogo(game.logo, "cal-logo"));
+      cell.appendChild(crest);
+
+      cell.appendChild(makeEl("span", "cal-code", game.short));
+      var meta = makeEl("span", "cal-meta");
+      meta.appendChild(makeEl("span", "cal-time", timeOf(game.start)));
+      meta.appendChild(makeEl("span", "cal-ha", t(game.home ? "schedule.homeShort" : "schedule.awayShort")));
+      cell.appendChild(meta);
+
+      calGrid.appendChild(cell);
+    }
+
+    renderDetail(games);
+  }
+
+  function renderDetail(games) {
+    if (!calDetail) return;
+    var index = 0;
+    games.forEach(function (game, i) { if (game.iso === state.selected) index = i; });
+    var game = games[index];
+    var status = gameStatus(game);
+
+    calDetail.innerHTML = "";
+    calDetail.className = "cal-detail is-" + status;
+
+    var head = makeEl("div", "cal-detail-head");
+    var tag = makeEl("p", "cal-detail-status");
+    tag.appendChild(makeEl("span", "cal-detail-dot"));
+    tag.appendChild(document.createTextNode(statusLabel(status)));
+    head.appendChild(tag);
+    head.appendChild(makeEl("p", "cal-detail-count", t("schedule.gameOf", { n: index + 1, total: games.length })));
+    calDetail.appendChild(head);
+
+    var matchup = makeEl("div", "cal-matchup");
+    var us = makeEl("div", "cal-side");
+    us.appendChild(makeLogo("static/favicon.svg", "cal-side-logo"));
+    us.appendChild(makeEl("span", "cal-side-name", "GACHON WIND"));
+    var them = makeEl("div", "cal-side");
+    them.appendChild(makeLogo(game.logo, "cal-side-logo"));
+    them.appendChild(makeEl("span", "cal-side-name", game.short));
+    /* "VS" at home, "@" away — GACHON WIND @ host reads the usual way. */
+    matchup.appendChild(us);
+    matchup.appendChild(makeEl("span", "cal-vs", game.home ? "VS" : "@"));
+    matchup.appendChild(them);
+    calDetail.appendChild(matchup);
+
+    calDetail.appendChild(makeEl("h3", "cal-detail-name", pick(game.opponent)));
+
+    var facts = makeEl("dl", "cal-facts");
+    [
+      ["schedule.date", fmt(game.start, { weekday: "long", day: "numeric", month: "long", year: "numeric" })],
+      ["schedule.time", timeOf(game.start) + " " + t("schedule.tz")],
+      ["schedule.venue", pick(game.venue)],
+      ["schedule.side", t(game.home ? "schedule.homeGame" : "schedule.awayGame")]
+    ].forEach(function (row) {
+      var wrap = makeEl("div", "cal-fact");
+      wrap.appendChild(makeEl("dt", "", t(row[0])));
+      wrap.appendChild(makeEl("dd", "", row[1]));
+      facts.appendChild(wrap);
+    });
+    calDetail.appendChild(facts);
+
+    var actions = makeEl("div", "cal-detail-actions");
+    if (status !== "played") {
+      var ics = makeEl("button", "btn btn-primary btn-sm");
+      ics.type = "button";
+      ics.setAttribute("data-cal-ics", "");
+      ics.appendChild(makeEl("span", "", t("schedule.addCal")));
+      var plus = makeEl("span", "", "＋");
+      plus.setAttribute("aria-hidden", "true");
+      ics.appendChild(plus);
+      actions.appendChild(ics);
+    }
+    var pager = makeEl("div", "cal-pager");
+    [[-1, "‹", "schedule.prevGame"], [1, "›", "schedule.nextGame"]].forEach(function (spec) {
+      var step = makeEl("button", "cal-step", spec[1]);
+      step.type = "button";
+      step.setAttribute("data-cal-step", String(spec[0]));
+      step.setAttribute("aria-label", t(spec[2]));
+      step.title = t(spec[2]);
+      step.disabled = !games[index + spec[0]];
+      pager.appendChild(step);
+    });
+    actions.appendChild(pager);
+    calDetail.appendChild(actions);
+  }
+
+  if (calGrid) {
+    calGrid.addEventListener("click", function (event) {
+      var cell = event.target.closest("[data-game]");
+      if (!cell) return;
+      var game = allGames().filter(function (g) { return g.iso === cell.getAttribute("data-game"); })[0];
+      if (game) selectGame(game, true);
+    });
+  }
+
+  [[calPrev, -1], [calNext, 1]].forEach(function (pair) {
+    if (!pair[0]) return;
+    pair[0].addEventListener("click", function () {
+      state.calMonth += pair[1];
+      /* Follow along: select the first game of the month we land on. */
+      var inMonth = allGames().filter(function (g) { return monthIndexOf(g.key) === state.calMonth; });
+      if (inMonth.length) state.selected = inMonth[0].iso;
+      renderCalendar();
+    });
+  });
+
+  if (calDetail) {
+    calDetail.addEventListener("click", function (event) {
+      var games = allGames();
+      var index = -1;
+      games.forEach(function (g, i) { if (g.iso === state.selected) index = i; });
+      if (index < 0) return;
+
+      if (event.target.closest("[data-cal-ics]")) {
+        downloadICS(games[index], "gachon-wind-vs-" + games[index].short.toLowerCase() + ".ics");
+        return;
+      }
+      var step = event.target.closest("[data-cal-step]");
+      if (step) {
+        var target = games[index + Number(step.getAttribute("data-cal-step"))];
+        if (!target) return;
+        selectGame(target, false);
+        var same = calDetail.querySelector('[data-cal-step="' + step.getAttribute("data-cal-step") + '"]');
+        if (same && !same.disabled) same.focus();
+        else if (calGrid) {
+          var cell = calGrid.querySelector('[data-game="' + target.iso + '"]');
+          if (cell) cell.focus();
+        }
+      }
+    });
+  }
+
+  function renderSchedule() {
+    var games = upcomingGames();
     state.next = games[0] || null;
     seasonComplete = !state.next;
 
@@ -391,6 +655,7 @@
       if (addCalendarButton) addCalendarButton.disabled = true;
     }
 
+    renderCalendar();
     updateCountdown();
   }
 
@@ -426,8 +691,7 @@
     return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   }
 
-  function buildICS() {
-    var game = state.next;
+  function buildICS(game) {
     if (!game) return null;
     var end = new Date(game.start.getTime() + 3 * 60 * 60 * 1000);
     var escape = function (text) {
@@ -452,19 +716,23 @@
     return lines.join("\r\n");
   }
 
+  function downloadICS(game, filename) {
+    var ics = buildICS(game);
+    if (!ics) return;
+    var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+
   if (addCalendarButton) {
     addCalendarButton.addEventListener("click", function () {
-      var ics = buildICS();
-      if (!ics) return;
-      var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-      var url = URL.createObjectURL(blob);
-      var link = document.createElement("a");
-      link.href = url;
-      link.download = "gachon-wind-next-game.ics";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      downloadICS(state.next, "gachon-wind-next-game.ics");
     });
   }
 

@@ -18,7 +18,7 @@ A responsive, multilingual homepage for **GACHON WIND**, Gachon University's stu
 | Hero | Brand lockup, practice details, primary CTAs, live “next game” card with D-day countdown |
 | Ticker | Club wordmark marquee, pausable on hover |
 | The club | Club profile, stats, three activity cards, home-field photo |
-| Fixtures | Next game panel (countdown + **.ics download**), upcoming-game list built from data |
+| Fixtures | Next game panel (countdown + **.ics download**), month calendar with opponent crests and a game-details card, built from data |
 | Why it's better | The proposal's three promises — always current, easy to join, truly accessible |
 | Gallery | Four-photo editorial grid with keyboard-accessible lightbox and Instagram strip |
 | Sign up | Three joining steps and an in-page application form (EN/KO/VI/JA) |
@@ -51,7 +51,8 @@ The nav links point to sections on this page, so nothing dead-ends — the start
 - **Five languages** — English, Korean, Vietnamese, Japanese and Simplified Chinese, switchable at any time from a dropdown. The choice is remembered, and the page title, dates, schedule, fixture names and form all follow it. Korean, Japanese and Chinese headings use a heavy CJK fallback because Anton has no Hangul, Kana or Han glyphs.
 - **Dark · light switcher** — a moon/sun button in the header (and in the mobile drawer) flips the whole palette: paper becomes night blue, royal blue lifts to a more saturated azure for display type, and the deep panels stay dark. The choice is remembered in `localStorage`; first-time visitors get their OS `prefers-color-scheme`, kept in sync until they toggle. A tiny inline script applies the theme before first paint, so there is no flash of the wrong theme, and the mobile browser chrome colour follows via `<meta name="theme-color">`. The flip itself cross-fades: the colour tokens are registered with `@property` and `<html>` transitions them on a non-linear ease-in-out curve, so the page glides like a dimmer rather than snapping, and the toggle's moon/sun glyphs trade places on the same curve — a quarter-turn carousel spin instead of a hard cut (all instant under `prefers-reduced-motion`).
 - **Live next-game countdown** — reads the fixture list, promotes the next future game, and hides itself when the season is over.
-- **Calendar download** — generates a valid `.ics` event (KST times converted to UTC) for the next fixture.
+- **Season calendar** — a month grid (Seoul dates) where every game day shows the opponent's crest, first-pitch time and home/away marker; the next game is ringed in red and played games fade out. Picking a day opens a card with the matchup, date, time, venue and its own `.ics` download, with previous/next-game stepping. Crests live in `static/img/teams/` (placeholder monograms — replace with official logos).
+- **Calendar download** — generates a valid `.ics` event (KST times converted to UTC) for the next fixture, or any upcoming game from the calendar card.
 - **Sign-up form** — client-side validation, translated errors and ARIA states. It assembles an application and hands it to the club's email (nothing is silently stored or “sent”). Users can copy the details instead.
 - **Gallery lightbox** — arrow-key navigation, captions, counter, focus trap, Escape to close.
 - **Mobile drawer** — full-screen menu with practice details and the language dropdown; background content is made `inert` while it is open.

@@ -1144,91 +1144,356 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
 }
 .next-link:hover { border-color: var(--red); }
 
-.fixtures { margin-top: clamp(36px, 4.6vw, 58px); }
-.fixtures-head,
-.fixture {
+/* Calendar — month grid on the left, game card on the right.
+   Game days are buttons carrying the opponent's crest; home games wear a
+   blue top bar, away games a red one, the next game a red ring. */
+.calendar {
   display: grid;
-  grid-template-columns: 1.1fr 1.7fr 1.35fr 0.55fr;
-  grid-template-areas: "date opponent venue time";
-  gap: 18px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: clamp(18px, 2.4vw, 32px);
+  align-items: start;
+  margin-top: clamp(36px, 4.6vw, 58px);
 }
-.fixtures-head {
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--blue);
-  color: var(--muted);
-  font-family: var(--narrow);
-  font-weight: 700;
-  font-size: 10px;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-}
-.fixtures-head span:nth-child(1) { grid-area: date; }
-.fixtures-head span:nth-child(2) { grid-area: opponent; }
-.fixtures-head span:nth-child(3) { grid-area: venue; }
-.fixtures-head span:nth-child(4) { grid-area: time; }
+.calendar[hidden] { display: none; }
 
-.fixtures-list { list-style: none; }
-.fixture {
-  padding: 16px 0;
-  border-bottom: 1px solid var(--line);
-  transition: background 0.25s;
+.cal-main {
+  padding: clamp(16px, 2.2vw, 28px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 40px rgba(17, 39, 74, 0.06);
 }
-.fixture:hover { background: var(--tint); }
-.fixture-date {
-  grid-area: date;
+.cal-toolbar {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--blue);
 }
-.fixture-day {
+.cal-month {
   color: var(--blue);
   font-family: var(--display);
-  font-size: 33px;
+  font-weight: 400;
+  font-size: clamp(24px, 2.6vw, 34px);
   line-height: 1;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
 }
-.fixture-md {
-  display: flex;
-  flex-direction: column;
+.cal-nav-group { display: flex; gap: 8px; }
+.cal-nav,
+.cal-step {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1.5px solid var(--line-strong);
+  background: transparent;
+  color: var(--blue);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.cal-nav svg { width: 15px; height: 15px; }
+.cal-nav:hover:not(:disabled),
+.cal-step:hover:not(:disabled) { background: var(--blue-panel); border-color: var(--blue-panel); color: var(--paper); }
+.cal-nav:disabled,
+.cal-step:disabled { opacity: 0.32; cursor: default; }
+
+.cal-weekdays,
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(3px, 0.5vw, 6px);
+}
+.cal-weekdays { padding: 14px 0 8px; }
+.cal-weekday {
   color: var(--muted);
   font-family: var(--narrow);
   font-weight: 700;
   font-size: 10px;
-  letter-spacing: 0.1em;
-  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-align: center;
   text-transform: uppercase;
 }
-.fixture-opponent {
-  grid-area: opponent;
+.cal-weekday.is-weekend { color: var(--red-ink); }
+.cal-weekday-narrow { display: none; }
+
+.cal-cell {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  gap: 9px;
+  min-height: clamp(64px, 8.4vw, 116px);
+  padding: 7px 6px 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
   color: var(--ink);
-  font-size: 16.5px;
-  font-weight: 600;
+  font: inherit;
+  text-align: center;
 }
-.badge {
-  padding: 3px 6px;
-  border: 1px solid rgba(255, 44, 62, 0.5);
-  color: var(--red-ink);
+.cal-cell.is-blank { border-color: transparent; background: transparent; }
+.cal-cell-top {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.cal-num {
+  align-self: flex-start;
+  min-width: 22px;
+  color: var(--ink-soft);
   font-family: var(--narrow);
   font-weight: 700;
+  font-size: 12px;
+  line-height: 22px;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+.cal-cell.is-weekend .cal-num { color: var(--muted); }
+.cal-cell.is-today .cal-num {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
+  text-align: center;
+}
+
+/* Game days */
+.cal-cell.has-game {
+  justify-content: space-between;
+  gap: 4px;
+  border-top: 3px solid var(--blue);
+  background: var(--surface);
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s;
+}
+.cal-cell.has-game.is-away { border-top-color: var(--red); }
+.cal-cell.has-game:hover {
+  z-index: 1;
+  transform: translateY(-3px);
+  box-shadow: 0 14px 26px rgba(17, 39, 74, 0.16);
+}
+.cal-cell.has-game:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; z-index: 2; }
+.cal-cell.is-next { box-shadow: inset 0 0 0 2px var(--red); }
+.cal-cell.is-next:hover { box-shadow: inset 0 0 0 2px var(--red), 0 14px 26px rgba(17, 39, 74, 0.16); }
+
+.cal-flag {
+  padding: 2px 5px;
+  background: var(--red-panel);
+  color: #fff;
+  font-family: var(--narrow);
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.cal-cell.is-played .cal-flag { background: var(--muted); }
+
+.cal-crest {
+  display: grid;
+  place-items: center;
+  width: clamp(30px, 3.8vw, 50px);
+  aspect-ratio: 1;
+}
+.cal-logo {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 3px 5px rgba(17, 39, 74, 0.22));
+  transition: transform 0.3s var(--ease);
+}
+.cal-cell.has-game:hover .cal-logo { transform: scale(1.08) rotate(-3deg); }
+.cal-code {
+  color: var(--ink);
+  font-family: var(--narrow);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+.cal-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--blue);
+  font-family: var(--narrow);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.cal-ha {
+  padding: 2px 4px;
+  border: 1px solid currentColor;
   font-size: 8.5px;
+  letter-spacing: 0.08em;
+}
+.cal-cell.is-away .cal-ha { color: var(--red-ink); }
+
+.cal-cell.is-played .cal-logo { filter: grayscale(1); opacity: 0.55; }
+.cal-cell.is-played .cal-code,
+.cal-cell.is-played .cal-meta { color: var(--muted); }
+
+.cal-cell.is-selected {
+  background: var(--blue-panel);
+  border-color: var(--blue-panel);
+}
+.cal-cell.is-selected.is-away { border-top-color: var(--red); }
+.cal-cell.is-selected .cal-num,
+.cal-cell.is-selected .cal-code,
+.cal-cell.is-selected .cal-meta,
+.cal-cell.is-selected .cal-ha { color: var(--paper); }
+
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 16px;
+  list-style: none;
+  color: var(--muted);
+  font-family: var(--narrow);
+  font-weight: 700;
+  font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-.badge.is-away { border-color: var(--line-strong); color: var(--muted); }
-.fixture-venue { grid-area: venue; color: var(--muted); font-size: 13px; }
-.fixture-time {
-  grid-area: time;
-  color: var(--blue);
+.cal-key { display: inline-flex; align-items: center; gap: 8px; }
+.cal-key::before { content: ""; display: inline-block; width: 16px; height: 11px; border: 1px solid var(--line-strong); }
+.cal-key.is-home::before { border-top: 3px solid var(--blue); }
+.cal-key.is-away::before { border-top: 3px solid var(--red); }
+.cal-key.is-next::before { border: 2px solid var(--red); }
+.cal-key.is-today::before { width: 11px; border: 0; border-radius: 50%; background: var(--red); }
+
+/* Game card */
+.cal-detail {
+  position: sticky;
+  top: calc(var(--header-h) + 18px);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 2.4vw, 28px);
+  background: var(--blue-panel);
+  background-image:
+    radial-gradient(circle at 85% 12%, rgba(255, 255, 255, 0.09) 0, transparent 50%),
+    linear-gradient(160deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.16));
+  color: var(--paper);
+  animation: cal-card-in 0.4s var(--ease);
+}
+@keyframes cal-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.cal-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cal-detail-status,
+.cal-detail-count {
   font-family: var(--narrow);
   font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
+.cal-detail-status { display: inline-flex; align-items: center; gap: 8px; }
+.cal-detail-count { color: rgba(248, 248, 248, 0.72); }
+.cal-detail-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(248, 248, 248, 0.7);
+}
+.cal-detail.is-next .cal-detail-dot { background: var(--red); box-shadow: 0 0 0 4px rgba(255, 44, 62, 0.25); }
+.cal-detail.is-played .cal-detail-dot { background: rgba(248, 248, 248, 0.35); }
+
+.cal-matchup {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: 26px 0 18px;
+  padding: 20px 0;
+  border-top: 1px solid rgba(248, 248, 248, 0.2);
+  border-bottom: 1px solid rgba(248, 248, 248, 0.2);
+}
+.cal-side { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 0; }
+.cal-side-logo {
+  width: clamp(58px, 6vw, 76px);
+  height: auto;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+}
+.cal-side-name {
+  max-width: 100%;
+  color: rgba(248, 248, 248, 0.86);
+  font-family: var(--narrow);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.cal-vs {
+  color: var(--red);
+  font-family: var(--display);
+  font-size: 22px;
+  line-height: 1;
+}
+.cal-detail-name {
+  color: var(--paper);
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(24px, 2.3vw, 30px);
+  line-height: 1.08;
+  letter-spacing: 0.012em;
+  text-transform: uppercase;
+}
+.cal-facts { display: grid; gap: 0; margin-top: 16px; }
+.cal-fact {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(248, 248, 248, 0.14);
+}
+.cal-fact dt {
+  color: rgba(248, 248, 248, 0.66);
+  font-family: var(--narrow);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  line-height: 1.9;
+  text-transform: uppercase;
+}
+.cal-fact dd { color: var(--paper); font-size: 14px; line-height: 1.45; }
+
+.cal-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+.cal-detail .btn-primary { background: var(--paper); border-color: var(--paper); color: var(--blue-panel); }
+.cal-detail .btn-primary:hover { background: var(--red-panel); border-color: var(--red-panel); color: #fff; }
+.cal-pager { display: flex; gap: 8px; margin-left: auto; }
+.cal-step {
+  border-color: rgba(248, 248, 248, 0.4);
+  color: var(--paper);
+  font-size: 20px;
+  line-height: 1;
+}
+.cal-step:hover:not(:disabled) { background: var(--paper); border-color: var(--paper); color: var(--blue-panel); }
+
 .fixtures-empty { padding: 28px 0; color: var(--muted); font-size: 14.5px; }
 .footnote {
   max-width: 72ch;
@@ -1862,9 +2127,12 @@ html[lang="zh"] .hero-next-match,
 html[lang="ko"] .hero-sub,
 html[lang="ja"] .hero-sub,
 html[lang="zh"] .hero-sub,
-html[lang="ko"] .fixture-day,
-html[lang="ja"] .fixture-day,
-html[lang="zh"] .fixture-day {
+html[lang="ko"] .cal-month,
+html[lang="ja"] .cal-month,
+html[lang="zh"] .cal-month,
+html[lang="ko"] .cal-detail-name,
+html[lang="ja"] .cal-detail-name,
+html[lang="zh"] .cal-detail-name {
   font-family: var(--sans);
   font-weight: 800;
   letter-spacing: 0;
@@ -1928,6 +2196,9 @@ html[lang="zh"] .activity p { max-width: 30em; }
   .countdown { justify-self: start; }
   .next-game-actions { justify-self: start; }
 
+  .calendar { grid-template-columns: 1fr; }
+  .cal-detail { position: static; }
+
   .values-grid { grid-template-columns: 1fr; gap: 34px; }
   .value { padding-top: 26px; }
   .value p { max-width: 58ch; }
@@ -1977,20 +2248,24 @@ html[lang="zh"] .activity p { max-width: 30em; }
   .hero-next-match { font-size: 18px; padding-right: 0; }
   .hero-next-count { position: static; margin-top: 2px; }
 
-  .fixtures-head { display: none; }
-  .fixtures-list .fixture {
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "date time"
-      "opponent opponent"
-      "venue venue";
-    gap: 8px 14px;
-    padding: 18px 0;
-  }
-  .fixture-opponent { font-size: 16px; }
-  .fixture-date { align-items: center; }
-  .fixture-day { font-size: 30px; }
-  .fixture-venue { font-size: 12.5px; }
+  .cal-main { padding: 14px 10px; }
+  .cal-toolbar { padding-bottom: 12px; }
+  .cal-nav { width: 36px; height: 36px; }
+  .cal-weekdays { padding: 10px 0 6px; }
+  .cal-weekday { font-size: 11px; letter-spacing: 0; }
+  .cal-weekday-short { display: none; }
+  .cal-weekday-narrow { display: inline; }
+  .cal-weekdays, .cal-grid { gap: 3px; }
+  .cal-cell { min-height: 56px; padding: 3px 2px 4px; }
+  .cal-cell.has-game { gap: 2px; justify-content: flex-start; }
+  .cal-num { min-width: 18px; font-size: 11px; line-height: 18px; }
+  .cal-cell.is-today .cal-num { width: 18px; height: 18px; }
+  .cal-flag, .cal-code, .cal-time { display: none; }
+  .cal-crest { width: 30px; }
+  .cal-meta { margin-top: auto; }
+  .cal-ha { padding: 1px 3px; font-size: 7.5px; }
+  .cal-legend { gap: 8px 14px; font-size: 9px; }
+  .cal-fact { grid-template-columns: 74px minmax(0, 1fr); }
 
   .contact-list li { grid-template-columns: 1fr; gap: 5px; }
   .contact-list li > a, .contact-list li > span:last-child { font-size: 15.5px; }
