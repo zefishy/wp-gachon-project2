@@ -632,10 +632,22 @@
           <button class="btn btn-ghost" type="button" data-copy>
             <span data-i18n="form.copy">Copy details</span>
           </button>
+          <button class="btn btn-primary" type="button" data-add-practice hidden>
+            <span data-i18n="form.addPractice">Add practice to calendar</span>
+            <span aria-hidden="true">+</span>
+          </button>
+          <a class="btn btn-ghost" data-chat-link href="#" target="_blank" rel="noopener" hidden>
+            <span data-i18n="form.joinChat">Join the group chat</span>
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
         <p class="copy-status" data-copy-status aria-live="polite"></p>
         <button class="link-btn" type="button" data-close-signup data-i18n="form.close">Close</button>
       </div>
+    </div>
+    <div class="toast" data-toast role="status" aria-live="polite" hidden>
+      <span class="toast-icon" aria-hidden="true">✓</span>
+      <span data-toast-text></span>
     </div>
   </dialog>
 

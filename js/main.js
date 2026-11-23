@@ -13,6 +13,11 @@
   "use strict";
 
   var CLUB_EMAIL = "gachonwind@gmail.com";
+  // Paste a free Web3Forms access key (https://web3forms.com) to send applications
+  // straight to CLUB_EMAIL. Leave empty to keep the "open my email app" flow.
+  var WEB3FORMS_KEY = "20915d4e-bb83-4f11-9f0c-7bcae48b8a12";
+  // Paste the club's KakaoTalk open-chat (or Discord) invite link to show a join button.
+  var CHAT_URL = "";
   var TIME_ZONE = "Asia/Seoul";
 
   var FIXTURES = [
@@ -986,10 +991,88 @@
     return "mailto:" + CLUB_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(applicationText(app));
   }
 
+  var practiceButton = $("[data-add-practice]");
+  var chatLink = $("[data-chat-link]");
+  var formNote = $(".form-note");
+  var submitButton = form ? form.querySelector('button[type="submit"]') : null;
+
   function renderApplication() {
     if (!state.app || !successBody) return;
-    successBody.textContent = t("form.successBody", { name: state.app.name });
-    if (mailtoLink) mailtoLink.setAttribute("href", mailtoHref(state.app));
+    var sent = state.app.sent;
+    successBody.textContent = (state.app.failed ? t("form.sendFailed") + " " : "") +
+      t(sent ? "form.sentBody" : "form.successBody", { name: state.app.name });
+    if (mailtoLink) {
+      mailtoLink.setAttribute("href", mailtoHref(state.app));
+      mailtoLink.hidden = sent;
+    }
+    if (copyButton) copyButton.hidden = sent;
+    if (practiceButton) practiceButton.hidden = !sent;
+    if (chatLink) {
+      chatLink.hidden = !(sent && CHAT_URL);
+      if (CHAT_URL) chatLink.setAttribute("href", CHAT_URL);
+    }
+  }
+
+  if (formNote && WEB3FORMS_KEY) formNote.hidden = true;
+
+  function submitToService(app) {
+    return fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        access_key: WEB3FORMS_KEY,
+        subject: t("form.mailSubject", { name: app.name }),
+        from_name: "GACHON WIND sign-up",
+        name: app.name,
+        email: app.email,
+        student_id: app.studentId,
+        experience: app.experience,
+        reason: app.reason,
+        language: app.lang,
+        botcheck: ""
+      })
+    }).then(function (response) { return response.json(); })
+      .then(function (data) { return !!(data && data.success); });
+  }
+
+  var toast = $("[data-toast]");
+  var toastText = $("[data-toast-text]");
+  var toastTimer = null;
+  var toastHideTimer = null;
+
+  function hideToast() {
+    if (!toast) return;
+    toast.classList.remove("is-in");
+    window.clearTimeout(toastHideTimer);
+    toastHideTimer = window.setTimeout(function () { toast.hidden = true; }, 400);
+  }
+
+  function showToast(message) {
+    if (!toast || !toastText) return;
+    window.clearTimeout(toastTimer);
+    window.clearTimeout(toastHideTimer);
+    toastText.textContent = message;
+    toast.hidden = false;
+    void toast.offsetWidth; // let the entrance transition run
+    toast.classList.add("is-in");
+    toastTimer = window.setTimeout(hideToast, 5000);
+  }
+
+  if (dialog) {
+    dialog.addEventListener("close", function () {
+      window.clearTimeout(toastTimer);
+      if (toast) { toast.classList.remove("is-in"); toast.hidden = true; }
+    });
+  }
+
+  function showSuccess() {
+    if (state.app.sent) showToast(t("form.toast"));
+    renderApplication();
+    if (formView) formView.hidden = true;
+    if (successView) successView.hidden = false;
+    if (copyStatus) copyStatus.textContent = "";
+    var primary = state.app.sent ? practiceButton : mailtoLink;
+    if (primary) primary.focus();
   }
 
   if (form) {
@@ -1003,12 +1086,65 @@
         return;
       }
       state.app = buildApplication();
-      renderApplication();
-      if (formView) formView.hidden = true;
-      if (successView) successView.hidden = false;
-      if (copyStatus) copyStatus.textContent = "";
-      var sendButton = $("[data-mailto]");
-      if (sendButton) sendButton.focus();
+      state.app.sent = false;
+      if (!WEB3FORMS_KEY) {
+        showSuccess();
+        return;
+      }
+      var label = submitButton ? submitButton.querySelector("[data-i18n]") : null;
+      var originalLabel = label ? label.textContent : "";
+      if (submitButton) submitButton.disabled = true;
+      if (label) label.textContent = t("form.sending");
+      submitToService(state.app).catch(function () { return false; }).then(function (ok) {
+        if (submitButton) submitButton.disabled = false;
+        if (label) label.textContent = originalLabel;
+        // On failure, fall back to the email flow so the application is never lost.
+        state.app.sent = ok;
+        state.app.failed = !ok;
+        showSuccess();
+      });
+    });
+  }
+
+  function practiceICS() {
+    // Weekly Tue/Thu 18:30–21:00 KST (= 09:30–12:00 UTC, Korea has no DST).
+    var now = new Date();
+    var start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 9, 30));
+    while ([2, 4].indexOf(start.getUTCDay()) === -1 || start.getTime() < now.getTime()) {
+      start = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+    }
+    var end = new Date(start.getTime() + 2.5 * 60 * 60 * 1000);
+    var esc = function (text) { return String(text).replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n"); };
+    return [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//GACHON WIND//Baseball Club//EN",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      "UID:gw-practice@gachonwind.club",
+      "DTSTAMP:" + icsDate(now),
+      "DTSTART:" + icsDate(start),
+      "DTEND:" + icsDate(end),
+      "RRULE:FREQ=WEEKLY;BYDAY=TU,TH",
+      "SUMMARY:" + esc(t("form.icsPracticeSummary")),
+      "LOCATION:" + esc(t("contact.fieldValue")),
+      "DESCRIPTION:" + esc(t("form.icsPracticeDesc")),
+      "END:VEVENT",
+      "END:VCALENDAR"
+    ].join("\r\n");
+  }
+
+  if (practiceButton) {
+    practiceButton.addEventListener("click", function () {
+      var blob = new Blob([practiceICS()], { type: "text/calendar;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.href = url;
+      link.download = "gachon-wind-practice.ics";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
     });
   }
 
