@@ -2042,32 +2042,6 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
   text-transform: uppercase;
 }
 
-/* ---------- Toast (lives inside the dialog so it sits in the top layer) ---------- */
-.toast {
-  position: fixed;
-  top: 18px;
-  left: 50%;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: calc(100vw - 28px);
-  padding: 12px 18px;
-  background: var(--blue-panel);
-  color: var(--paper);
-  border-left: 4px solid var(--red);
-  box-shadow: 0 10px 30px rgba(8, 18, 34, 0.35);
-  font-size: 13.5px;
-  line-height: 1.4;
-  opacity: 0;
-  transform: translate(-50%, -16px);
-  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
-  pointer-events: none;
-}
-.toast.is-in { opacity: 1; transform: translate(-50%, 0); }
-.toast-icon { font-weight: 700; }
-@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
-
 /* ---------- Motion ---------- */
 .reveal {
   opacity: 0;

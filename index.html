@@ -566,7 +566,7 @@
           </div>
           <p class="form-error" data-form-error role="alert" hidden></p>
           <button class="btn btn-primary" type="submit">
-            <span data-i18n="form.submit">Build my application</span>
+            <span data-i18n="form.submit">Submit application</span>
             <span class="btn-arrow" aria-hidden="true">→</span>
           </button>
           <p class="form-note" data-i18n="form.note">Your application opens in your email app. Nothing is sent automatically.</p>
@@ -574,8 +574,8 @@
       </div>
 
       <div class="signup-success" data-signup-success-view hidden>
-        <p class="kicker"><span class="kicker-mark" aria-hidden="true"></span><span data-i18n="form.successKicker">Ready to send</span></p>
-        <h2 class="signup-title" data-i18n="form.successTitle">Almost done.</h2>
+        <p class="kicker"><span class="kicker-mark" aria-hidden="true"></span><span data-i18n="form.successKicker" data-success-kicker>Ready to send</span></p>
+        <h2 class="signup-title" data-i18n="form.successTitle" data-success-title>Almost done.</h2>
         <p class="signup-sub" data-success-body></p>
         <div class="success-actions">
           <a class="btn btn-primary" data-mailto href="#">
@@ -585,10 +585,6 @@
           <button class="btn btn-ghost" type="button" data-copy>
             <span data-i18n="form.copy">Copy details</span>
           </button>
-          <button class="btn btn-primary" type="button" data-add-practice hidden>
-            <span data-i18n="form.addPractice">Add practice to calendar</span>
-            <span aria-hidden="true">+</span>
-          </button>
           <a class="btn btn-ghost" data-chat-link href="#" target="_blank" rel="noopener" hidden>
             <span data-i18n="form.joinChat">Join the group chat</span>
             <span aria-hidden="true">→</span>
@@ -597,10 +593,6 @@
         <p class="copy-status" data-copy-status aria-live="polite"></p>
         <button class="link-btn" type="button" data-close-signup data-i18n="form.close">Close</button>
       </div>
-    </div>
-    <div class="toast" data-toast role="status" aria-live="polite" hidden>
-      <span class="toast-icon" aria-hidden="true">✓</span>
-      <span data-toast-text></span>
     </div>
   </dialog>
 

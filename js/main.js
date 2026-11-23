@@ -991,7 +991,6 @@
     return "mailto:" + CLUB_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(applicationText(app));
   }
 
-  var practiceButton = $("[data-add-practice]");
   var chatLink = $("[data-chat-link]");
   var formNote = $(".form-note");
   var submitButton = form ? form.querySelector('button[type="submit"]') : null;
@@ -999,6 +998,10 @@
   function renderApplication() {
     if (!state.app || !successBody) return;
     var sent = state.app.sent;
+    var kicker = $("[data-success-kicker]");
+    var title = $("[data-success-title]");
+    if (kicker) kicker.textContent = t(sent ? "form.sentKicker" : "form.successKicker");
+    if (title) title.textContent = t(sent ? "form.sentTitle" : "form.successTitle");
     successBody.textContent = (state.app.failed ? t("form.sendFailed") + " " : "") +
       t(sent ? "form.sentBody" : "form.successBody", { name: state.app.name });
     if (mailtoLink) {
@@ -1006,7 +1009,6 @@
       mailtoLink.hidden = sent;
     }
     if (copyButton) copyButton.hidden = sent;
-    if (practiceButton) practiceButton.hidden = !sent;
     if (chatLink) {
       chatLink.hidden = !(sent && CHAT_URL);
       if (CHAT_URL) chatLink.setAttribute("href", CHAT_URL);
@@ -1035,43 +1037,12 @@
       .then(function (data) { return !!(data && data.success); });
   }
 
-  var toast = $("[data-toast]");
-  var toastText = $("[data-toast-text]");
-  var toastTimer = null;
-  var toastHideTimer = null;
-
-  function hideToast() {
-    if (!toast) return;
-    toast.classList.remove("is-in");
-    window.clearTimeout(toastHideTimer);
-    toastHideTimer = window.setTimeout(function () { toast.hidden = true; }, 400);
-  }
-
-  function showToast(message) {
-    if (!toast || !toastText) return;
-    window.clearTimeout(toastTimer);
-    window.clearTimeout(toastHideTimer);
-    toastText.textContent = message;
-    toast.hidden = false;
-    void toast.offsetWidth; // let the entrance transition run
-    toast.classList.add("is-in");
-    toastTimer = window.setTimeout(hideToast, 5000);
-  }
-
-  if (dialog) {
-    dialog.addEventListener("close", function () {
-      window.clearTimeout(toastTimer);
-      if (toast) { toast.classList.remove("is-in"); toast.hidden = true; }
-    });
-  }
-
   function showSuccess() {
-    if (state.app.sent) showToast(t("form.toast"));
     renderApplication();
     if (formView) formView.hidden = true;
     if (successView) successView.hidden = false;
     if (copyStatus) copyStatus.textContent = "";
-    var primary = state.app.sent ? practiceButton : mailtoLink;
+    var primary = state.app.sent ? (chatLink && !chatLink.hidden ? chatLink : $(".signup .link-btn")) : mailtoLink;
     if (primary) primary.focus();
   }
 
@@ -1103,48 +1074,6 @@
         state.app.failed = !ok;
         showSuccess();
       });
-    });
-  }
-
-  function practiceICS() {
-    // Weekly Tue/Thu 18:30–21:00 KST (= 09:30–12:00 UTC, Korea has no DST).
-    var now = new Date();
-    var start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 9, 30));
-    while ([2, 4].indexOf(start.getUTCDay()) === -1 || start.getTime() < now.getTime()) {
-      start = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-    }
-    var end = new Date(start.getTime() + 2.5 * 60 * 60 * 1000);
-    var esc = function (text) { return String(text).replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n"); };
-    return [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//GACHON WIND//Baseball Club//EN",
-      "CALSCALE:GREGORIAN",
-      "BEGIN:VEVENT",
-      "UID:gw-practice@gachonwind.club",
-      "DTSTAMP:" + icsDate(now),
-      "DTSTART:" + icsDate(start),
-      "DTEND:" + icsDate(end),
-      "RRULE:FREQ=WEEKLY;BYDAY=TU,TH",
-      "SUMMARY:" + esc(t("form.icsPracticeSummary")),
-      "LOCATION:" + esc(t("contact.fieldValue")),
-      "DESCRIPTION:" + esc(t("form.icsPracticeDesc")),
-      "END:VEVENT",
-      "END:VCALENDAR"
-    ].join("\r\n");
-  }
-
-  if (practiceButton) {
-    practiceButton.addEventListener("click", function () {
-      var blob = new Blob([practiceICS()], { type: "text/calendar;charset=utf-8" });
-      var url = URL.createObjectURL(blob);
-      var link = document.createElement("a");
-      link.href = url;
-      link.download = "gachon-wind-practice.ics";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
     });
   }
 
