@@ -1974,7 +1974,22 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
   text-transform: uppercase;
 }
 .signup-sub { max-width: 44ch; color: var(--ink-soft); font-size: 13.5px; line-height: 1.55; }
-.signup-form { display: grid; gap: 15px; margin-top: 22px; }
+.signup-form { display: grid; gap: 12px; margin-top: 16px; }
+@media (min-width: 561px) {
+  .signup { width: min(640px, calc(100vw - 28px)); }
+  .signup-shell { padding: clamp(18px, 3.5vh, 36px) clamp(26px, 4vw, 40px); }
+  .signup-form { grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+  .signup-form > :nth-child(n+5) { grid-column: 1 / -1; }
+}
+.field textarea { min-height: 64px; }
+@media (max-height: 760px) {
+  .signup-shell { padding-top: 18px; padding-bottom: 18px; }
+  .signup-title { margin: 6px 0 4px; }
+  .signup-form { margin-top: 12px; gap: 9px 16px; }
+  .field label { margin-bottom: 4px; }
+  .field input, .field select, .field textarea { padding: 8px 10px; }
+  .form-note { font-size: 10.5px; }
+}
 .field label {
   display: flex;
   gap: 5px;
@@ -1999,7 +2014,7 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
   font-family: var(--sans);
   font-size: 15px;
 }
-.field textarea { resize: vertical; min-height: 88px; }
+.field textarea { resize: none; }
 .field input::placeholder,
 .field textarea::placeholder { color: var(--placeholder); opacity: 1; }
 .field input:focus-visible,
