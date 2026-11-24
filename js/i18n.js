@@ -31,7 +31,7 @@ window.GW_I18N = {
     "hero.fieldValue": "Gachon University, Global Campus",
     "hero.photoTag": "2026 Fall Series",
     "hero.nextLabel": "Next game",
-    "hero.nextAria": "Next game — jump to the schedule",
+    "hero.nextHint": "— jump to the schedule",
     "hero.alt": "A GACHON WIND batter waiting for the pitch",
 
     "about.kicker": "The club",
@@ -220,7 +220,7 @@ window.GW_I18N = {
     "hero.fieldValue": "가천대학교 글로벌캠퍼스",
     "hero.photoTag": "2026 가을 시리즈",
     "hero.nextLabel": "다음 경기",
-    "hero.nextAria": "다음 경기 — 경기 일정으로 이동",
+    "hero.nextHint": "— 경기 일정으로 이동",
     "hero.alt": "투구를 기다리는 GACHON WIND 타자",
 
     "about.kicker": "동아리 소개",
@@ -409,7 +409,7 @@ window.GW_I18N = {
     "hero.fieldValue": "Đại học Gachon, Cơ sở Global",
     "hero.photoTag": "Mùa thu 2026",
     "hero.nextLabel": "Trận tiếp theo",
-    "hero.nextAria": "Trận tiếp theo — đến lịch thi đấu",
+    "hero.nextHint": "— đến lịch thi đấu",
     "hero.alt": "Cầu thủ GACHON WIND chờ bóng",
 
     "about.kicker": "Về câu lạc bộ",
@@ -598,7 +598,7 @@ window.GW_I18N = {
     "hero.fieldValue": "嘉泉大学グローバルキャンパス",
     "hero.photoTag": "2026 秋シリーズ",
     "hero.nextLabel": "次の試合",
-    "hero.nextAria": "次の試合 — 日程へ移動",
+    "hero.nextHint": "— 日程へ移動",
     "hero.alt": "投球を待つGACHON WINDの打者",
 
     "about.kicker": "クラブについて",
@@ -787,7 +787,7 @@ window.GW_I18N = {
     "hero.fieldValue": "嘉泉大学全球校区",
     "hero.photoTag": "2026 秋季系列赛",
     "hero.nextLabel": "下一场比赛",
-    "hero.nextAria": "下一场比赛 — 跳转到赛程",
+    "hero.nextHint": "— 跳转到赛程",
     "hero.alt": "正在等待投球的 GACHON WIND 击球员",
 
     "about.kicker": "关于社团",
