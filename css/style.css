@@ -1306,6 +1306,7 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
 .cal-logo {
   width: 100%;
   height: 100%;
+  object-fit: contain;
   filter: drop-shadow(0 3px 5px rgba(17, 39, 74, 0.22));
   transition: transform 0.3s var(--ease);
 }
@@ -1429,6 +1430,8 @@ html[data-theme="dark"] .theme-btn .icon-sun { opacity: 1; transform: none; }
 .cal-side-logo {
   width: clamp(58px, 6vw, 76px);
   height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
 }
 .cal-side-name {
